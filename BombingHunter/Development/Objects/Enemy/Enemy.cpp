@@ -17,8 +17,8 @@ Enemy::~Enemy()
 void Enemy::Initialize()
 {
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/Fly-enemy1.png");
-	animation[1] = LoadGraph("Resource/Images/Fly-enemy2.png");
+	animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
+	animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
 
 	//エラーチェック
 	if (animation[0] == -1 || animation[1] == -1)
@@ -88,7 +88,7 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	velocity = 0.0f;
+	velocity *= -1.0f;
 }
 
 //移動処理

@@ -17,8 +17,8 @@ Player::~Player()
 void Player::Initialize()
 {
 	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/Tri-pilot1.png");
-	animation[1] = LoadGraph("Resource/Images/Tri-pilot2.png");
+	animation[0] = LoadGraph("Resource/Images/Tri-pilot/1.png");
+	animation[1] = LoadGraph("Resource/Images/Tri-pilot/2.png");
 
 	//エラーチェック
 	if (animation[0]==-1||animation[1]==-1)
@@ -77,12 +77,12 @@ void Player::Movement()
 	//左右移動
 	if (InputControl::GetKey(KEY_INPUT_LEFT))
 	{
-		velocity.x += -1.0f;
+		velocity.x += -2.0f;
 		flip_flag = TRUE;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
-		velocity.x += 1.0f;
+		velocity.x += 2.0f;
 		flip_flag = FALSE;
 	}
 	else
@@ -93,11 +93,11 @@ void Player::Movement()
 	//上下移動
 	if (InputControl::GetKey(KEY_INPUT_UP))
 	{
-		velocity.y += -1.0f;
+		velocity.y += -2.0f;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_DOWN))
 	{
-		velocity.y += 1.0f;
+		velocity.y += 2.0f;
 	}
 	else
 	{
