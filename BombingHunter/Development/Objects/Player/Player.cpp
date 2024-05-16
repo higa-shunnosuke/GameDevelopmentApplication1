@@ -3,11 +3,10 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Player::Player() :animation_count(0), filp_flag(FALSE)
+Player::Player():animation_count(0),flip_flag(FALSE)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
-
 }
 
 //デストラクタ
@@ -22,7 +21,7 @@ void Player::Initialize()
 	animation[1] = LoadGraph("Resource/Images/Tri-pilot2.png");
 
 	//エラーチェック
-	if (animation[0] == -1 || animation[1] == -1)
+	if (animation[0]==-1||animation[1]==-1)
 	{
 		throw ("トリパイロットの画像がありません\n");
 	}
@@ -31,7 +30,7 @@ void Player::Initialize()
 	radian = 0.0;
 
 	//大きさの設定
-	box_size = Vector2D(64.0f);
+	box_size = 64.0f;
 
 	//初期画像の設定
 	image = animation[0];
@@ -50,9 +49,8 @@ void Player::Update()
 void Player::Draw() const
 {
 	//プレイヤー画像の描画
-	DrawRotaGraphF(location.x, location.y, 1.0, radian, image, TRUE, filp_flag);
+	DrawRotaGraphF(location.x, location.y, 0.8, radian, image, TRUE, flip_flag);
 
-	//デバック用
 	__super::Draw();
 }
 
@@ -80,17 +78,19 @@ void Player::Movement()
 	if (InputControl::GetKey(KEY_INPUT_LEFT))
 	{
 		velocity.x += -1.0f;
-		filp_flag = TRUE;
+		flip_flag = TRUE;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
 		velocity.x += 1.0f;
-		filp_flag = FALSE;
+		flip_flag = FALSE;
 	}
 	else
 	{
 		velocity.x += 0.0f;
 	}
+	
+	//上下移動
 	if (InputControl::GetKey(KEY_INPUT_UP))
 	{
 		velocity.y += -1.0f;
@@ -103,7 +103,7 @@ void Player::Movement()
 	{
 		velocity.y += 0.0f;
 	}
-
+	
 	//現在の位置座標に速さを加算する
 	location += velocity;
 }
@@ -115,13 +115,13 @@ void Player::AnimeControl()
 	animation_count++;
 
 	//６０フレーム目に到達したら
-	if (animation_count >= 60)
+	if (animation_count>=60)
 	{
 		//カウントのリセット
 		animation_count = 0;
 
 		//画像の切り替え
-		if (image == animation[0])
+		if (image==animation[0])
 		{
 			image = animation[1];
 		}

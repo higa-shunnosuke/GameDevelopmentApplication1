@@ -2,12 +2,17 @@
 
 #include"vector"
 #include"string"
+#include"random"
 #include"../Objects/GameObject.h"
 
 class Scene
 {
 private:
 	std::vector<GameObject*> objects;
+	int spawn_count;
+	float LocationX[2];		//固定X座標
+	float LocationY[4];		//固定Y座標
+	int image;				//背景画像
 
 public:
 	Scene();
@@ -38,10 +43,11 @@ private:
 			throw std::string("ゲームオブジェクトが生成できませんでした");
 		}
 
-		//初期化処理
-		new_object->Initialize();
 		//位置情報の設定
 		new_object->SetLocation(location);
+
+		//初期化処理
+		new_object->Initialize();
 
 		//オブジェクトリストに追加
 		objects.push_back(new_object);

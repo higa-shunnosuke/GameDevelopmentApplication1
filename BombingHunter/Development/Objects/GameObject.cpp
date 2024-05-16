@@ -2,7 +2,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-GameObject::GameObject() :
+GameObject::GameObject() : 
 	location(0.0f),
 	box_size(0.0f),
 	radian(0.0),
