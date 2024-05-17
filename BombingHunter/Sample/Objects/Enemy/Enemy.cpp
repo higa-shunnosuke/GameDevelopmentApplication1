@@ -3,7 +3,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Enemy::Enemy() :animation_count(0), direction(0.0f)
+Enemy::Enemy() :frame_count(0), direction(0.0f)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -110,13 +110,13 @@ void Enemy::Movement()
 void Enemy::AnimeControl()
 {
 	//フレームカウントを加算する
-	animation_count++;
+	frame_count++;
 
 	//６０フレーム目に到達したら
-	if (animation_count >= 30)
+	if (frame_count >= 30)
 	{
 		//カウントのリセット
-		animation_count = 0;
+		frame_count = 0;
 
 		//画像の切り替え
 		if (image == animation[0])

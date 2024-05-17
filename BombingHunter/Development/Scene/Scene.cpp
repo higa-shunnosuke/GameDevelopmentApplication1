@@ -6,9 +6,10 @@
 //コンストラクタ
 Scene::Scene():objects(),spawn_count(0), image(NULL)
 {
+	//x座標
 	LocationX[0] = 0.0f;
 	LocationX[1] = 640.0f;
-
+	//y座標
 	LocationY[0] = 150.0f;
 	LocationY[1] = 250.0f;
 	LocationY[2] = 350.0f;
@@ -28,16 +29,16 @@ void Scene::Initialize()
 	image = LoadGraph("Resource/Images/background.png");
 
 	//プレイヤーを生成する
-	CreateObject<Player>(Vector2D(320.0f, 50.0f));
+	CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
 	//エネミーを生成する
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[0]));
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[0]));
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[1]));
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[1]));
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[2]));
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[2]));
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[3]));
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[3]));
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[0]),0);
+	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[0]),2);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[1]),4);
+	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[1]),0);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[2]),0);
+	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[2]),0);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[3]),1);
+	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[3]),3);
 }
 
 //更新処理

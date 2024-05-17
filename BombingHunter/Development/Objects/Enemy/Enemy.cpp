@@ -3,10 +3,12 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Enemy::Enemy() :animation_count(0), velocity(0.0)
+Enemy::Enemy() :frame_count(0),animation_max(0), velocity(0.0),count(0)
 {
-	animation[0] = NULL;
-	animation[1] = NULL;
+	for (int i = 0; i < 5; i++)
+	{
+		animation[i] = NULL;
+	}
 }
 
 //デストラクタ
@@ -14,23 +16,70 @@ Enemy::~Enemy()
 {}
 
 //初期化処理
-void Enemy::Initialize()
+void Enemy::Initialize(int type)
 {
-	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
-	animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
-
-	//エラーチェック
-	if (animation[0] == -1 || animation[1] == -1)
+	switch (type)
 	{
-		throw ("ハネテキの画像がありません\n");
+	case 1:
+		//画像の読み込み
+		animation[0] = LoadGraph("Resource/Images/Box-enemy/1.png");
+		animation[1] = LoadGraph("Resource/Images/Box-enemy/2.png");
+		animation[2] = NULL;
+		animation[3] = NULL;
+		animation[4] = NULL;
+		//大きさの設定
+		box_size = 64.0f;
+		break;
+	case 2:
+		//画像の読み込み
+		animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
+		animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
+		animation[2] = NULL;
+		animation[3] = NULL;
+		animation[4] = NULL;
+		//大きさの設定
+		box_size = 64.0f;
+		break;
+	case 3:
+		//画像の読み込み
+		animation[0] = LoadGraph("Resource/Images/Gorld-enemy/1.png");
+		animation[1] = LoadGraph("Resource/Images/Gorld-enemy/2.png");
+		animation[2] = LoadGraph("Resource/Images/Gorld-enemy/3.png");
+		animation[3] = LoadGraph("Resource/Images/Gorld-enemy/4.png");
+		animation[4] = LoadGraph("Resource/Images/Gorld-enemy/5.png");
+		//大きさの設定
+		box_size = 64.0f;
+		break;
+	case 4:
+		//画像の読み込み
+		animation[0] = LoadGraph("Resource/Images/Harpy/1.png");
+		animation[1] = LoadGraph("Resource/Images/Harpy/2.png");
+		animation[2] = NULL;
+		animation[3] = NULL;
+		animation[4] = NULL;
+		//大きさの設定
+		box_size = 64.0f;
+		break;
+	default:
+		break;
 	}
+	
+	//エラーチェック
+	for (int i = 0; i < 5; i++)
+	{
+		if (animation[i] == -1)
+		{
+			throw ("ハネテキの画像がありません\n");
+		}
+		else if (animation[i] != 0)
+		{
+			animation_max++;
+		}
+	}
+	
 
 	//向きの設定
 	radian = 0.0;
-
-	//大きさの設定
-	box_size = 64.0f;
 
 	//初期画像の設定
 	image = animation[0];
@@ -80,15 +129,17 @@ void Enemy::Draw() const
 void Enemy::Finalize()
 {
 	//使用した画像を開放する
-	DeleteGraph(animation[0]);
-	DeleteGraph(animation[1]);
+	for (int i = 0; i < 5; i++)
+	{
+		DeleteGraph(animation[i]);
+	}
 }
 
 //当たり判定通知処理
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	velocity *= -1.0f;
+	velocity *= 0.0f;
 }
 
 //移動処理
@@ -112,22 +163,24 @@ void Enemy::Movement()
 void Enemy::AnimeControl()
 {
 	//フレームカウントを加算する
-	animation_count++;
+	frame_count++;
 
 	//６０フレーム目に到達したら
-	if (animation_count >= 60)
+	if (frame_count >= 60)
 	{
 		//カウントのリセット
-		animation_count = 0;
+		frame_count = 0;
 
 		//画像の切り替え
-		if (image == animation[0])
+		if (image == animation[animation_max-1])
 		{
-			image = animation[1];
+			count = 0;
+			image = animation[count];
 		}
 		else
 		{
-			image = animation[0];
+			count++;
+			image = animation[count];
 		}
 	}
 }

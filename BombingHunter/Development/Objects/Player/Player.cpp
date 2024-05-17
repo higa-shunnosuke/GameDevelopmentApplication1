@@ -3,7 +3,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Player::Player():animation_count(0),flip_flag(FALSE)
+Player::Player():frame_count(0),flip_flag(FALSE)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -14,7 +14,7 @@ Player::~Player()
 {}
 
 //初期化処理
-void Player::Initialize()
+void Player::Initialize(int type)
 {
 	//画像の読み込み
 	animation[0] = LoadGraph("Resource/Images/Tri-pilot/1.png");
@@ -112,13 +112,13 @@ void Player::Movement()
 void Player::AnimeControl()
 {
 	//フレームカウントを加算する
-	animation_count++;
+	frame_count++;
 
 	//６０フレーム目に到達したら
-	if (animation_count>=60)
+	if (frame_count>=60)
 	{
 		//カウントのリセット
-		animation_count = 0;
+		frame_count = 0;
 
 		//画像の切り替え
 		if (image==animation[0])
