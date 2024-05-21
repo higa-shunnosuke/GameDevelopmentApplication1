@@ -20,7 +20,7 @@ void Enemy::Initialize(int type)
 {
 	switch (type)
 	{
-	case 1:
+	case 0:
 		//‰æ‘œ‚Ì“Ç‚İ‚İ
 		animation[0] = LoadGraph("Resource/Images/Box-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Box-enemy/2.png");
@@ -28,9 +28,9 @@ void Enemy::Initialize(int type)
 		animation[3] = NULL;
 		animation[4] = NULL;
 		//‘å‚«‚³‚Ìİ’è
-		box_size = 64.0f;
+		box_size = 70.0f;
 		break;
-	case 2:
+	case 1:
 		//‰æ‘œ‚Ì“Ç‚İ‚İ
 		animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
@@ -38,9 +38,9 @@ void Enemy::Initialize(int type)
 		animation[3] = NULL;
 		animation[4] = NULL;
 		//‘å‚«‚³‚Ìİ’è
-		box_size = 64.0f;
+		box_size = 70.0f;
 		break;
-	case 3:
+	case 2:
 		//‰æ‘œ‚Ì“Ç‚İ‚İ
 		animation[0] = LoadGraph("Resource/Images/Gorld-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Gorld-enemy/2.png");
@@ -48,9 +48,9 @@ void Enemy::Initialize(int type)
 		animation[3] = LoadGraph("Resource/Images/Gorld-enemy/4.png");
 		animation[4] = LoadGraph("Resource/Images/Gorld-enemy/5.png");
 		//‘å‚«‚³‚Ìİ’è
-		box_size = 64.0f;
+		box_size = 50.0f;
 		break;
-	case 4:
+	case 3:
 		//‰æ‘œ‚Ì“Ç‚İ‚İ
 		animation[0] = LoadGraph("Resource/Images/Harpy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Harpy/2.png");
@@ -58,7 +58,7 @@ void Enemy::Initialize(int type)
 		animation[3] = NULL;
 		animation[4] = NULL;
 		//‘å‚«‚³‚Ìİ’è
-		box_size = 64.0f;
+		box_size = 80.0f;
 		break;
 	default:
 		break;

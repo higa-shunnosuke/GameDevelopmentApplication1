@@ -13,6 +13,8 @@ private:
 	float LocationX[2];		//固定X座標
 	float LocationY[4];		//固定Y座標
 	int image;				//背景画像
+	int type;				//敵のタイプ
+	int Enemy_count[4];		//敵の数のカウント
 
 public:
 	Scene();

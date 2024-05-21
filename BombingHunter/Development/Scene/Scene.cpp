@@ -1,10 +1,11 @@
 #include "Scene.h"
 #include "../Objects/Player/Player.h"
 #include "../Objects/Enemy/Enemy.h"
+#include"../Utility/InputControl.h"
 #include"DxLib.h"
 
 //コンストラクタ
-Scene::Scene():objects(),spawn_count(0), image(NULL)
+Scene::Scene():objects(),spawn_count(0), image(NULL),type(0)
 {
 	//x座標
 	LocationX[0] = 0.0f;
@@ -14,6 +15,13 @@ Scene::Scene():objects(),spawn_count(0), image(NULL)
 	LocationY[1] = 250.0f;
 	LocationY[2] = 350.0f;
 	LocationY[3] = 450.0f;
+
+	//敵の数のカウントの初期化
+
+	Enemy_count[0] = 0;
+	Enemy_count[1] = 0;
+	Enemy_count[2] = 0;
+	Enemy_count[3] = 0;
 }
 
 //デストラクタ
@@ -31,19 +39,26 @@ void Scene::Initialize()
 	//プレイヤーを生成する
 	CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
 	//エネミーを生成する
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[0]),0);
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[0]),2);
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[1]),4);
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[1]),0);
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[2]),0);
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[2]),0);
-	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[3]),1);
-	CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[3]),3);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[0]), 0);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[1]), 1);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[2]), 2);
+	CreateObject<Enemy>(Vector2D(LocationX[0], LocationY[3]), 3);
+
 }
 
 //更新処理
 void Scene::Update()
 {
+	if (InputControl::GetKeyDown(KEY_INPUT_Z))
+	{
+		if (Enemy_count[type] < 4)
+		{
+			CreateObject<Enemy>(Vector2D(LocationX[1], LocationY[type]), type);
+			Enemy_count[type] += 1;
+			type++;
+		}
+	}
+		
 	//シーンに存在するオブジェクトの更新処理
 	for (GameObject* obj:objects)
 	{
@@ -69,6 +84,12 @@ void Scene::Draw() const
 	{
 		obj->Draw();
 	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
+	}
+	DrawFormatString(10, 90, 0x00, "タイプ：%d", type);
 }
 
 //終了時処理
