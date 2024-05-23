@@ -14,7 +14,7 @@ private:
 	float LocationY[4];		//固定Y座標
 	int image;				//背景画像
 	int type;				//敵のタイプ
-	int Enemy_count[4];		//敵の数のカウント
+	int Enemy_count[4];		//敵の出現数
 
 public:
 	Scene();
@@ -33,7 +33,7 @@ private:
 	template <class T>
 	T* CreateObject(const Vector2D& location,int type)
 	{
-		//
+		//インスタンスを生成する
 		T* new_instance = new T();
 		//指定したクラスを生成する
 		GameObject* new_object = dynamic_cast<GameObject*>(new_instance);

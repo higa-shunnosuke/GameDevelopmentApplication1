@@ -1,5 +1,5 @@
-#include "Player.h"
-#include "../../Utility/InputControl.h"
+#include"Player.h"
+#include"../../Utility/InputControl.h"
 #include"DxLib.h"
 
 //コンストラクタ
@@ -72,40 +72,40 @@ void Player::OnHitCollision(GameObject* hit_object)
 void Player::Movement()
 {
 	//移動の速さ
-	Vector2D velocity = 0.0f;
+	Vector2D vector = 0.0f;
 
 	//左右移動
 	if (InputControl::GetKey(KEY_INPUT_LEFT))
 	{
-		velocity.x += -2.0f;
+		vector.x += -2.0f;
 		flip_flag = TRUE;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
-		velocity.x += 2.0f;
+		vector.x += 2.0f;
 		flip_flag = FALSE;
 	}
 	else
 	{
-		velocity.x += 0.0f;
+		vector.x += 0.0f;
 	}
 	
 	//上下移動
 	if (InputControl::GetKey(KEY_INPUT_UP))
 	{
-		velocity.y += -2.0f;
+		vector.y += -2.0f;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_DOWN))
 	{
-		velocity.y += 2.0f;
+		vector.y += 2.0f;
 	}
 	else
 	{
-		velocity.y += 0.0f;
+		vector.y += 0.0f;
 	}
 	
 	//現在の位置座標に速さを加算する
-	location += velocity;
+	location += vector;
 }
 
 //アニメーション制御
