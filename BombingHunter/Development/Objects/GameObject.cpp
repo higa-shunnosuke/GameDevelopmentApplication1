@@ -59,6 +59,20 @@ void GameObject::OnHitCollision(GameObject* hit_object)
 	//当たった時に行う処理
 }
 
+//削除判定通知処理
+bool GameObject::Delete()
+{
+	//削除時に行う処理
+	bool ret = false;
+	return ret;
+}
+
+//タイプ取得処理
+int GameObject::GetType()
+{
+	return 0;
+}
+
 //位置情報取得処理
 Vector2D GameObject::GetLocation() const
 {

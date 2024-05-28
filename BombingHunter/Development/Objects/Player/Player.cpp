@@ -49,7 +49,7 @@ void Player::Update()
 void Player::Draw() const
 {
 	//プレイヤー画像の描画
-	DrawRotaGraphF(location.x, location.y, 0.8, radian, image, TRUE, flip_flag);
+	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
 
 	__super::Draw();
 }
@@ -66,6 +66,12 @@ void Player::Finalize()
 void Player::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
+}
+
+//位置情報取得処理
+Vector2D Player::GetLocation() const
+{
+	return this->location;
 }
 
 //移動処理

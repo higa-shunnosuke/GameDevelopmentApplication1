@@ -1,8 +1,9 @@
 #pragma once
 
 #include"../GameObject.h"
+#include"../Player/Player.h"
 
-class Enemy :public GameObject
+class Bullet :public GameObject
 {
 private:
 	int animation[5];			//アニメーション画像
@@ -10,12 +11,11 @@ private:
 	int animation_max;			//アニメーション画像の枚数
 	int count;					//アニメーション画像のカウント
 	Vector2D vector;			//移動方向
-	float speed;				//移動速度
-	int type;					//敵のタイプ
+	Player* player;
 
 public:
-	Enemy();
-	~Enemy();
+	Bullet();
+	~Bullet();
 
 	virtual void Initialize(int type) override;	//初期化処理
 	virtual void Update() override;		//更新処理
@@ -26,9 +26,8 @@ public:
 	virtual void OnHitCollision(GameObject* hit_object) override;
 	//削除判定通知処理
 	virtual bool Delete() override;
-
-	//タイプ取得処理
-	int GetType();
+	//プレイヤーのポインタを受け取る
+	virtual void SetPlayer(class Player* player);
 
 private:
 	//移動処理
@@ -36,6 +35,6 @@ private:
 	//アニメーション制御
 	void AnimeControl();
 
-};
 
+};
 

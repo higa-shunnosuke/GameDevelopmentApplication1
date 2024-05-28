@@ -5,9 +5,9 @@
 class Player:public GameObject
 {
 private:
-	int animation[2];			//アニメーション画像
+	int animation[2];		//アニメーション画像
 	int frame_count;		//アニメーション時間
-	int flip_flag;				//反転フラグ
+	int flip_flag;			//反転フラグ
 
 public:
 	Player();
@@ -20,6 +20,9 @@ public:
 
 	//当たり判定通知処理
 	virtual void OnHitCollision(GameObject* hit_object) override;
+
+	//位置情報取得処理
+	Vector2D GetLocation() const;
 
 private:
 	//移動処理

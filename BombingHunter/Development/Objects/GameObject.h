@@ -25,6 +25,11 @@ public:
 
 	//当たり判定通知処理
 	virtual void OnHitCollision(GameObject* hit_object);
+	//削除判定通知処理
+	virtual bool Delete();
+
+	//タイプ取得処理
+	virtual int GetType();
 
 	//位置情報取得処理
 	Vector2D GetLocation() const;

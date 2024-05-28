@@ -1,22 +1,24 @@
 #include "Scene.h"
 #include "../Objects/Player/Player.h"
 #include "../Objects/Enemy/Enemy.h"
+#include "../Objects/Enemy/Bullet.h"
 #include "../Utility/InputControl.h"
 #include "DxLib.h"
 
 bool Is_pause;			//ポーズフラグ
+Player* p;
 
 //コンストラクタ
-Scene::Scene():objects(), spawn_count(0), image(NULL), type(0)
+Scene::Scene():objects(), spawn_count(0), image(NULL)
 {
 	//x座標
 	LocationX[0] = 0.0f;
 	LocationX[1] = 640.0f;
 	//y座標
 	LocationY[0] = 150.0f;
-	LocationY[1] = 250.0f;
-	LocationY[2] = 350.0f;
-	LocationY[3] = 450.0f;
+	LocationY[1] = 240.0f;
+	LocationY[2] = 330.0f;
+	LocationY[3] = 410.0f;
 
 	//敵の数のカウントの初期化
 	for (int i = 0; i < 4; i++)
@@ -38,14 +40,14 @@ void Scene::Initialize()
 	image = LoadGraph("Resource/Images/background.png");
 
 	//プレイヤーを生成する
-	CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
+	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
+	CreateObject<Bullet>(Vector2D(320.0f, 240.0f), 0)->SetPlayer(p);
 
 	//敵の出現数の設定
 	Enemy_count[0] = 3;
 	Enemy_count[1] = 5;
 	Enemy_count[2] = 2;
 	Enemy_count[3] = 1;
-	
 
 	//ポーズフラグの初期化
 	Is_pause = false;
@@ -54,9 +56,7 @@ void Scene::Initialize()
 //更新処理
 void Scene::Update()
 {
-	type = GetRand(3);	//ランダムな値を取得
-
-	//Is_pauseがtrueのとき
+	//ポーズ状態のとき
 	if (Is_pause == true)
 	{
 		//スペースキーを押すとポーズを解除する
@@ -72,7 +72,7 @@ void Scene::Update()
 			Initialize();
 		}
 	}
-	//Is_pauseがfalseのとき
+	//ポーズ状態じゃないのとき
 	else
 	{
 		//スペースキーを押すとポーズにする
@@ -81,28 +81,48 @@ void Scene::Update()
 			Is_pause = true;
 		}
 
-		//Zキーを押すと敵を生成する
-		if (InputControl::GetKeyDown(KEY_INPUT_Z))
+		//それぞれのエネミーを出現数の上限まで生成する
+		//ハーピーを生成する
+		if (Enemy_count[0] > 0)
 		{
-			//それぞれのエネミーの出現数を制限する
-			if (Enemy_count[type] > 0)
+			//生成する確率を調整
+			if (GetRand(100) <= 1)
 			{
-				//エネミーのオブジェクトを生成
-				if (type < 2)
-				{
-					//ハーピーをハネ敵の生成
-					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), type);
-				}
-				else
-				{
-					//ハコ敵と金の敵の生成
-					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), type);
-				}
-				//それぞれのエネミーのカウントする
-				Enemy_count[type] -= 1;
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 0);
+				Enemy_count[0] -= 1;
 			}
 		}
-
+		//ハネテキを生成する
+		if (Enemy_count[1] > 0)
+		{
+			//生成する確率を調整
+			if (GetRand(100) <= 1)
+			{
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 1);
+				Enemy_count[1] -= 1;
+			}
+		}
+		//ハコテキを生成する
+		if (Enemy_count[2] > 0)
+		{
+			//生成する確率を調整
+			if (GetRand(100) <= 1)
+			{
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 2);
+				Enemy_count[2] -= 1;
+			}
+		}
+		//金のテキを生成する
+		if (Enemy_count[3] > 0)
+		{
+			//生成する確率を調整
+			if (GetRand(100) <= 1)
+			{
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 3);
+				Enemy_count[3] -= 1;
+			}
+		}
+		
 		//シーンに存在するオブジェクトの更新処理
 		for (GameObject* obj : objects)
 		{
@@ -115,6 +135,17 @@ void Scene::Update()
 			//当たり判定チェック処理
 			HitCheckObject(objects[0], objects[i]);
 		}
+		
+		//オブジェクトの削除判定チェック
+		for (int i = 0; i < objects.size(); i++)
+		{
+			//削除判定チェック処理
+			if (objects[i]->Delete() == true)
+			{
+				Enemy_count[objects[i]->GetType()]++;
+				objects.erase(objects.begin() + i);
+			}
+		}
 	}
 }
 
@@ -122,7 +153,7 @@ void Scene::Update()
 void Scene::Draw() const
 {
 	//背景画像の描画
-	DrawRotaGraphF(320.0f, 240.0f, 0.8, 0, image, TRUE, 0);
+	DrawRotaGraphF(320.0f, 240.0f, 0.7, 0, image, TRUE, 0);
 
 	//シーンに存在するオブジェクトの描画処理
 	for (GameObject* obj:objects)
@@ -134,8 +165,6 @@ void Scene::Draw() const
 	{
 		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
 	}
-	DrawFormatString(10, 90, 0x00, "タイプ：%d", type);
-	DrawFormatString(10, 110, 0x00, "pause：%d", Is_pause);
 }
 
 //終了時処理
@@ -147,13 +176,10 @@ void Scene::Finalize()
 		return;
 	}
 
-	//イレースを使って要素の削除をする
-	objects.erase(objects.begin(), objects.begin() + objects.size());
-
 	//各オブジェクトを削除する
 	for (GameObject* obj:objects)
 	{
-		//obj->Finalize();
+		obj->Finalize();
 		delete obj;
 	}
 

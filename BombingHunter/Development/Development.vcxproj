@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppMain.cpp" />
+    <ClCompile Include="Objects\Enemy\Bullet.cpp" />
     <ClCompile Include="Objects\Enemy\Enemy.cpp" />
     <ClCompile Include="Objects\GameObject.cpp" />
     <ClCompile Include="Utility\InputControl.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="Utility\Vector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Objects\Enemy\Bullet.h" />
     <ClInclude Include="Objects\Enemy\Enemy.h" />
     <ClInclude Include="Objects\GameObject.h" />
     <ClInclude Include="Utility\InputControl.h" />

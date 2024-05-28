@@ -1,9 +1,8 @@
 #include"Enemy.h"
-#include"../../Utility/InputControl.h"
 #include"DxLib.h"
 
 //コンストラクタ
-Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f)
+Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),type(0)
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -16,9 +15,9 @@ Enemy::~Enemy()
 {}
 
 //初期化処理
-void Enemy::Initialize(int type)
+void Enemy::Initialize(int e_type)
 {
-	switch (type)
+	switch (e_type)
 	{
 	case 0:
 		//画像の読み込み
@@ -31,6 +30,8 @@ void Enemy::Initialize(int type)
 		box_size = 80.0f;
 		//移動速度の設定
 		speed = 1.0f + (float)GetRand(1);
+		//敵のタイプの設定
+		type = e_type;
 		break;
 	case 1:
 		//画像の読み込み
@@ -43,7 +44,8 @@ void Enemy::Initialize(int type)
 		box_size = 70.0f;
 		//移動速度の設定
 		speed = 1.0f + (float)GetRand(1);
-		break;
+		//敵のタイプの設定
+		type = e_type;		break;
 	case 2:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Box-enemy/1.png");
@@ -55,6 +57,8 @@ void Enemy::Initialize(int type)
 		box_size = 70.0f;
 		//移動速度の設定
 		speed = 0.7f;
+		//敵のタイプの設定
+		type = e_type;
 		break;
 	case 3:
 		//画像の読み込み
@@ -67,6 +71,8 @@ void Enemy::Initialize(int type)
 		box_size = 50.0f;
 		//移動速度の設定
 		speed = 1.0f;
+		//敵のタイプの設定
+		type = e_type;
 		break;
 	default:
 		break;
@@ -128,7 +134,7 @@ void Enemy::Draw() const
 	}
 
 	//プレイヤー画像の描画
-	DrawRotaGraphF(location.x, location.y, 0.8, radian, image, TRUE, flip_flag);
+	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
 
 	__super::Draw();
 }
@@ -150,18 +156,42 @@ void Enemy::OnHitCollision(GameObject* hit_object)
 	vector *= 0.0f;
 }
 
-//移動処理
-void Enemy::Movement()
+//削除判定通知処理
+bool Enemy::Delete()
 {
+	bool ret = false;
+
 	//壁で反射する
 	if (location.x > 640.0f)
 	{
-		vector.x *= -1.0f;
+		ret = true;
 	}
 	if (location.x < 0.0f)
 	{
-		vector.x *= -1.0f;
+		ret = true;
 	}
+
+	return ret;
+}
+
+//タイプ取得処理
+int Enemy::GetType()
+{
+	return type;
+}
+
+//移動処理
+void Enemy::Movement()
+{
+	////壁で反射する
+	//if (location.x > 640.0f)
+	//{
+	//	vector.x *= -1.0f;
+	//}
+	//if (location.x < 0.0f)
+	//{
+	//	vector.x *= -1.0f;
+	//}
 
 	//現在の位置座標に速さを加算する
 	location += vector;
