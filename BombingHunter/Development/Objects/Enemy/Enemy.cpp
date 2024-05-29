@@ -12,7 +12,9 @@ Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0
 
 //デストラクタ
 Enemy::~Enemy()
-{}
+{
+	Finalize();
+}
 
 //初期化処理
 void Enemy::Initialize(int e_type)
@@ -153,7 +155,6 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	vector *= 0.0f;
 }
 
 //削除判定通知処理
@@ -162,17 +163,24 @@ bool Enemy::Delete()
 	bool ret = false;
 
 	//壁で反射する
-	if (location.x > 640.0f)
+	if (location.x > 640.0f + box_size.x)
 	{
 		ret = true;
 	}
-	if (location.x < 0.0f)
+	if (location.x < 0.0f - box_size.x)
 	{
 		ret = true;
 	}
 
 	return ret;
 }
+
+//プレイヤーのポインタを受け取る
+void Enemy::SetPlayer(Player* player)
+{
+	this->player = player;
+}
+
 
 //タイプ取得処理
 int Enemy::GetType()
@@ -183,16 +191,6 @@ int Enemy::GetType()
 //移動処理
 void Enemy::Movement()
 {
-	////壁で反射する
-	//if (location.x > 640.0f)
-	//{
-	//	vector.x *= -1.0f;
-	//}
-	//if (location.x < 0.0f)
-	//{
-	//	vector.x *= -1.0f;
-	//}
-
 	//現在の位置座標に速さを加算する
 	location += vector;
 }

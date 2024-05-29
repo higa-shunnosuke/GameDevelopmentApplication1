@@ -56,6 +56,7 @@ void Scene::Initialize()
 //更新処理
 void Scene::Update()
 {
+
 	//ポーズ状態のとき
 	if (Is_pause == true)
 	{

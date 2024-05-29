@@ -1,6 +1,7 @@
 #pragma once
 
 #include"../GameObject.h"
+#include"../Player/Player.h"
 
 class Enemy :public GameObject
 {
@@ -12,6 +13,7 @@ private:
 	Vector2D vector;			//移動方向
 	float speed;				//移動速度
 	int type;					//敵のタイプ
+	Player* player;
 
 public:
 	Enemy();
@@ -26,7 +28,8 @@ public:
 	virtual void OnHitCollision(GameObject* hit_object) override;
 	//削除判定通知処理
 	virtual bool Delete() override;
-
+	//プレイヤーのポインタを受け取る
+	virtual void SetPlayer(class Player* player);
 	//タイプ取得処理
 	int GetType();
 

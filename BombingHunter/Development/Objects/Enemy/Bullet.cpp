@@ -10,6 +10,7 @@ Bullet::Bullet() :frame_count(0), animation_max(0), count(0), vector(0.0)
 	}
 
 	player = nullptr;
+
 }
 
 //デストラクタ
@@ -46,7 +47,8 @@ void Bullet::Initialize(int e_type)
 	image = animation[0];
 
 	//移動速度の設定
-	vector = Vector2D(1.0f, 0.0f);
+	vector = Vector2D(0.1f, 0.0f);
+
 }
 
 //更新処理
@@ -99,6 +101,10 @@ bool Bullet::Delete()
 	{
 		ret = true;
 	}
+	if (location.y < 0.0f)
+	{
+		ret = true;
+	}
 
 	return ret;
 }
@@ -114,20 +120,20 @@ void Bullet::Movement()
 {
 	if (player->GetLocation().x > location.x)
 	{
-		vector.x += 1.0f;
+		vector.x += 0.1f;
 	}
 	else
 	{
-		vector.x -= 1.0f;
+		vector.x -= 0.1f;
 	}
 	
 	if (player->GetLocation().y > location.y)
 	{
-		vector.y += 1.0f;
+		vector.y += 0.1f;
 	}
 	else
 	{
-		vector.y -= 1.0f;
+		vector.y -= 0.1f;
 	}
 
 	//現在の位置座標に速さを加算する
