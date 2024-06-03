@@ -13,7 +13,8 @@ private:
 	Vector2D vector;			//移動方向
 	float speed;				//移動速度
 	int type;					//敵のタイプ
-	Player* player;
+	bool Is_hit;				//ボムに当たったか
+	Player* player;				//プレイヤーのポインター
 
 public:
 	Enemy();

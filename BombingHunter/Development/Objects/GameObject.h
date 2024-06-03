@@ -18,7 +18,7 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	virtual void Initialize(int type);	//‰Šú‰»ˆ—
+	virtual void Initialize(int type);//‰Šú‰»ˆ—
 	virtual void Update();		//XVˆ—
 	virtual void Draw() const;	//•`‰æˆ—
 	virtual void Finalize();	//I—¹ˆ—

@@ -8,6 +8,7 @@ private:
 	int animation[2];		//アニメーション画像
 	int frame_count;		//アニメーション時間
 	int flip_flag;			//反転フラグ
+	bool Is_hit;			//弾に当たったか
 
 public:
 	Player();

@@ -2,7 +2,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),type(0)
+Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),type(0), Is_hit(false)
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -114,10 +114,14 @@ void Enemy::Initialize(int e_type)
 //更新処理
 void Enemy::Update()
 {
-	//移動処理
-	Movement();
-	//アニメーション制御
-	AnimeControl();
+	//ボムに当たるまで
+	if (Is_hit != true)
+	{
+		//移動処理
+		Movement();
+		//アニメーション制御
+		AnimeControl();
+	}
 }
 
 //描画処理
