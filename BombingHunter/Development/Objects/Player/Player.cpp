@@ -14,7 +14,7 @@ Player::~Player()
 {}
 
 //‰Šú‰»ˆ—
-void Player::Initialize(int type)
+void Player::Initialize(int player_type)
 {
 	//‰æ‘œ‚Ì“Ç‚İ‚İ
 	animation[0] = LoadGraph("Resource/Images/Tri-pilot/1.png");

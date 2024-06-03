@@ -29,7 +29,7 @@ void Enemy::Initialize(int e_type)
 		animation[3] = NULL;
 		animation[4] = NULL;
 		//大きさの設定
-		box_size = 80.0f;
+		box_size = 70.0f;
 		//移動速度の設定
 		speed = 1.0f + (float)GetRand(1);
 		//敵のタイプの設定
@@ -45,7 +45,7 @@ void Enemy::Initialize(int e_type)
 		//大きさの設定
 		box_size = 70.0f;
 		//移動速度の設定
-		speed = 1.0f + (float)GetRand(1);
+		speed = 2.0f + (float)GetRand(2);
 		//敵のタイプの設定
 		type = e_type;		break;
 	case 2:
@@ -58,7 +58,7 @@ void Enemy::Initialize(int e_type)
 		//大きさの設定
 		box_size = 70.0f;
 		//移動速度の設定
-		speed = 0.7f;
+		speed = 2.0f;
 		//敵のタイプの設定
 		type = e_type;
 		break;
@@ -72,7 +72,7 @@ void Enemy::Initialize(int e_type)
 		//大きさの設定
 		box_size = 50.0f;
 		//移動速度の設定
-		speed = 1.0f;
+		speed = 3.0f;
 		//敵のタイプの設定
 		type = e_type;
 		break;

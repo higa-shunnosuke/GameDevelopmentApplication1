@@ -9,7 +9,8 @@ class Scene
 {
 private:
 	std::vector<GameObject*> objects;
-	int spawn_count;
+	int frame_count;		//フレームカウント
+	int time;				//タイマー
 	float LocationX[2];		//固定X座標
 	float LocationY[4];		//固定Y座標
 	int image;				//背景画像

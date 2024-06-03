@@ -9,7 +9,7 @@ bool Is_pause;			//ポーズフラグ
 Player* p;
 
 //コンストラクタ
-Scene::Scene():objects(), spawn_count(0), image(NULL)
+Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
 {
 	//x座標
 	LocationX[0] = 0.0f;
@@ -41,12 +41,12 @@ void Scene::Initialize()
 
 	//プレイヤーを生成する
 	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
-	CreateObject<Bullet>(Vector2D(320.0f, 240.0f), 0)->SetPlayer(p);
+	//CreateObject<Bullet>(Vector2D(320.0f, 240.0f), 0)->SetPlayer(p);
 
 	//敵の出現数の設定
-	Enemy_count[0] = 3;
+	Enemy_count[0] = 2;
 	Enemy_count[1] = 5;
-	Enemy_count[2] = 2;
+	Enemy_count[2] = 1;
 	Enemy_count[3] = 1;
 
 	//ポーズフラグの初期化
@@ -56,6 +56,16 @@ void Scene::Initialize()
 //更新処理
 void Scene::Update()
 {
+	//フレームカウントを加算する
+	frame_count++;
+
+	//６０フレーム目に到達したら
+	if (frame_count >= 60)
+	{
+		//カウントのリセット
+		frame_count = 0;
+		time--;
+	}
 
 	//ポーズ状態のとき
 	if (Is_pause == true)
@@ -84,20 +94,24 @@ void Scene::Update()
 
 		//それぞれのエネミーを出現数の上限まで生成する
 		//ハーピーを生成する
+		//生成を１秒待ってハーピーが重ならないようにする
 		if (Enemy_count[0] > 0)
 		{
 			//生成する確率を調整
-			if (GetRand(100) <= 1)
+			if (frame_count == 0)
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 0);
-				Enemy_count[0] -= 1;
+				if (GetRand(100) <= 40)
+				{
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), 0);
+					Enemy_count[0] -= 1;
+				}
 			}
 		}
 		//ハネテキを生成する
 		if (Enemy_count[1] > 0)
 		{
 			//生成する確率を調整
-			if (GetRand(100) <= 1)
+			if (GetRand(100) <= 20)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 1);
 				Enemy_count[1] -= 1;
@@ -107,7 +121,7 @@ void Scene::Update()
 		if (Enemy_count[2] > 0)
 		{
 			//生成する確率を調整
-			if (GetRand(100) <= 1)
+			if (GetRand(100) <= 50)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 2);
 				Enemy_count[2] -= 1;
@@ -166,6 +180,9 @@ void Scene::Draw() const
 	{
 		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
 	}
+	DrawFormatString(10, 90, 0x00, "フレーム：%d", frame_count);
+	DrawFormatString(10, 110, 0x00, "時間：%d", time);
+
 }
 
 //終了時処理
