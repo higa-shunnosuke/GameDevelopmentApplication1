@@ -8,6 +8,8 @@ Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0
 	{
 		animation[i] = NULL;
 	}
+
+	player = nullptr;
 }
 
 //デストラクタ
@@ -72,7 +74,7 @@ void Enemy::Initialize(int e_type)
 		//大きさの設定
 		box_size = 50.0f;
 		//移動速度の設定
-		speed = 3.0f;
+		speed = 2.5f;
 		//敵のタイプの設定
 		type = e_type;
 		break;

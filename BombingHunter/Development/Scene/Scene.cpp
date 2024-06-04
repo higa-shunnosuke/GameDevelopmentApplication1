@@ -44,29 +44,24 @@ void Scene::Initialize()
 	//CreateObject<Bullet>(Vector2D(320.0f, 240.0f), 0)->SetPlayer(p);
 
 	//敵の出現数の設定
-	Enemy_count[0] = 2;
-	Enemy_count[1] = 5;
-	Enemy_count[2] = 1;
-	Enemy_count[3] = 1;
+	Enemy_count[0] = 0;
+	Enemy_count[1] = 0;
+	Enemy_count[2] = 0;
+	Enemy_count[3] = 0;
 
 	//ポーズフラグの初期化
 	Is_pause = false;
+
+	//フレームカウントの初期化
+	frame_count = 0;
+
+	//制限時間の初期化
+	time = 60;
 }
 
 //更新処理
 void Scene::Update()
 {
-	//フレームカウントを加算する
-	frame_count++;
-
-	//６０フレーム目に到達したら
-	if (frame_count >= 60)
-	{
-		//カウントのリセット
-		frame_count = 0;
-		time--;
-	}
-
 	//ポーズ状態のとき
 	if (Is_pause == true)
 	{
@@ -92,49 +87,63 @@ void Scene::Update()
 			Is_pause = true;
 		}
 
+		//フレームカウントを加算する
+		frame_count++;
+
+		//６０フレーム目に到達したら
+		if (frame_count % 60 == 0)
+		{
+			//カウントのリセット
+			time--;
+		}
+
 		//それぞれのエネミーを出現数の上限まで生成する
 		//ハーピーを生成する
 		//生成を１秒待ってハーピーが重ならないようにする
-		if (Enemy_count[0] > 0)
+		if (Enemy_count[0] < 2)
 		{
 			//生成する確率を調整
-			if (frame_count == 0)
+			if (frame_count % 60 == 0)
 			{
 				if (GetRand(100) <= 40)
 				{
 					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), 0);
-					Enemy_count[0] -= 1;
+					Enemy_count[0] += 1;
 				}
 			}
 		}
 		//ハネテキを生成する
-		if (Enemy_count[1] > 0)
+		if (Enemy_count[1] < 5)
 		{
-			//生成する確率を調整
-			if (GetRand(100) <= 20)
+			if (frame_count / 60 >= Enemy_count[1])
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 1);
-				Enemy_count[1] -= 1;
+				//生成する確率を調整
+				if (GetRand(100) <= 20)
+				{
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 1);
+					Enemy_count[1] += 1;
+					frame_count = 0;
+				}
 			}
 		}
 		//ハコテキを生成する
-		if (Enemy_count[2] > 0)
+		if (Enemy_count[2] < 1)
 		{
 			//生成する確率を調整
 			if (GetRand(100) <= 50)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 2);
-				Enemy_count[2] -= 1;
+				Enemy_count[2] += 1;
 			}
 		}
 		//金のテキを生成する
-		if (Enemy_count[3] > 0)
+		if (Enemy_count[3] < 1)
 		{
 			//生成する確率を調整
 			if (GetRand(100) <= 1)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 3);
-				Enemy_count[3] -= 1;
+				Enemy_count[3] += 1;
 			}
 		}
 		
@@ -157,7 +166,7 @@ void Scene::Update()
 			//削除判定チェック処理
 			if (objects[i]->Delete() == true)
 			{
-				Enemy_count[objects[i]->GetType()]++;
+				Enemy_count[objects[i]->GetType()]--;
 				objects.erase(objects.begin() + i);
 			}
 		}

@@ -7,6 +7,7 @@ Player::Player():frame_count(0),flip_flag(FALSE)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
+	Is_hit = false;
 }
 
 //デストラクタ
@@ -94,6 +95,16 @@ void Player::Movement()
 	else
 	{
 		vector.x += 0.0f;
+	}
+	
+	//壁の処理
+	if (location.x < box_size.x / 2.0f)
+	{
+		vector.x += 2.0f;
+	}
+	if (location.x > 640.0f - box_size.x / 2.0f)
+	{
+		vector.x -= 2.0f;
 	}
 	
 	//上下移動
