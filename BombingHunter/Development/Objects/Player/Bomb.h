@@ -12,6 +12,7 @@ private:
 	int count;					//アニメーション画像のカウント
 	Vector2D vector;			//移動方向
 	Player* player;
+	bool Is_hit;				//ヒットしたか
 
 public:
 	Bomb();
@@ -32,9 +33,6 @@ public:
 private:
 	//移動処理
 	void Movement();
-	//アニメーション制御
-	void AnimeControl();
-
 
 };
 

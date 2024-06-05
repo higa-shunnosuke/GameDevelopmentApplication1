@@ -44,6 +44,7 @@ void Player::Update()
 	Movement();
 	//アニメーション制御
 	AnimeControl();
+
 }
 
 //描画処理

@@ -116,11 +116,12 @@ void Enemy::Initialize(int e_type)
 //更新処理
 void Enemy::Update()
 {
+	//移動処理
+	Movement();
+
 	//ボムに当たるまで
 	if (Is_hit != true)
 	{
-		//移動処理
-		Movement();
 		//アニメーション制御
 		AnimeControl();
 	}
@@ -161,6 +162,15 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
+	Is_hit = true;
+
+	//vector.x = 0.0f;
+	//vector.y = 1.0f;
+
+	/*for (int i = 0; i < 10; i++)
+	{
+		vector.x *= -1;
+	}*/
 }
 
 //削除判定通知処理

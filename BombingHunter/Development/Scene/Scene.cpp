@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "../Objects/Player/Player.h"
+#include "../Objects/Player/Bomb.h"
 #include "../Objects/Enemy/Enemy.h"
 #include "../Objects/Enemy/Bullet.h"
 #include "../Utility/InputControl.h"
@@ -41,7 +42,6 @@ void Scene::Initialize()
 
 	//プレイヤーを生成する
 	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
-	//CreateObject<Bullet>(Vector2D(320.0f, 240.0f), 0)->SetPlayer(p);
 
 	//敵の出現数の設定
 	Enemy_count[0] = 0;
@@ -147,6 +147,12 @@ void Scene::Update()
 			}
 		}
 		
+		//Zキーが押されたら、ボムを生成する
+		if (InputControl::GetKeyDown(KEY_INPUT_Z))
+		{
+			CreateObject<Bomb>(objects[0]->GetLocation(), 0);
+		}
+
 		//シーンに存在するオブジェクトの更新処理
 		for (GameObject* obj : objects)
 		{
