@@ -6,8 +6,9 @@
 #include "../Utility/InputControl.h"
 #include "DxLib.h"
 
-bool Is_pause;			//ポーズフラグ
-Player* p;
+bool Is_pause;		//ポーズフラグ
+Player* p;			//プレイヤーのポインタ
+Bomb* b;			//ボムのポインタ
 
 //コンストラクタ
 Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
@@ -21,11 +22,14 @@ Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
 	LocationY[2] = 330.0f;
 	LocationY[3] = 410.0f;
 
-	//敵の数のカウントの初期化
+	//敵の数のカウントを初期化
 	for (int i = 0; i < 4; i++)
 	{
 		Enemy_count[i] = 0;
 	}
+
+	//ボムの数のカウントを初期化
+	Bomb_count = 0;
 }
 
 //デストラクタ
@@ -66,7 +70,7 @@ void Scene::Update()
 	if (Is_pause == true)
 	{
 		//スペースキーを押すとポーズを解除する
-		if (InputControl::GetKeyDown(KEY_INPUT_SPACE))
+		if (InputControl::GetKeyDown(KEY_INPUT_Z))
 		{
 			Is_pause = false;
 		}
@@ -82,7 +86,7 @@ void Scene::Update()
 	else
 	{
 		//スペースキーを押すとポーズにする
-		if (InputControl::GetKeyDown(KEY_INPUT_SPACE))
+		if (InputControl::GetKeyDown(KEY_INPUT_Z))
 		{
 			Is_pause = true;
 		}
@@ -148,9 +152,14 @@ void Scene::Update()
 		}
 		
 		//Zキーが押されたら、ボムを生成する
-		if (InputControl::GetKeyDown(KEY_INPUT_Z))
+		if (InputControl::GetKeyDown(KEY_INPUT_SPACE))
 		{
-			CreateObject<Bomb>(objects[0]->GetLocation(), 0);
+			if (Bomb_count < 1)
+			{
+				b = CreateObject<Bomb>(objects[0]->GetLocation(), 0);
+				b->SetPlayer(p);
+				Bomb_count++;
+			}
 		}
 
 		//シーンに存在するオブジェクトの更新処理
@@ -162,8 +171,11 @@ void Scene::Update()
 		//オブジェクト同士の当たり判定チェック
 		for (int i = 0; i < objects.size(); i++)
 		{
-			//当たり判定チェック処理
-			HitCheckObject(objects[0], objects[i]);
+			for (int j = i + 1; j < objects.size(); j++)
+			{
+				//当たり判定チェック処理
+				HitCheckObject(objects[i], objects[j]);
+			}
 		}
 		
 		//オブジェクトの削除判定チェック
@@ -172,7 +184,14 @@ void Scene::Update()
 			//削除判定チェック処理
 			if (objects[i]->Delete() == true)
 			{
-				Enemy_count[objects[i]->GetType()]--;
+				if (objects[i] != b)
+				{
+					Enemy_count[objects[i]->GetType()]--;
+				}
+				else
+				{
+					Bomb_count--;
+				}
 				objects.erase(objects.begin() + i);
 			}
 		}

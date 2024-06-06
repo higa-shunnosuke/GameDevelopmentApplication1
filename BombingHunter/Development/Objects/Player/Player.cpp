@@ -3,7 +3,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Player::Player():frame_count(0),flip_flag(FALSE)
+Player::Player():frame_count(0),flip_flag(FALSE),direction(0)
 {
 	animation[0] = NULL;
 	animation[1] = NULL;
@@ -76,6 +76,12 @@ Vector2D Player::GetLocation() const
 	return this->location;
 }
 
+//位置情報取得処理
+int Player::GetDirection() const
+{
+	return this->direction;
+}
+
 //移動処理
 void Player::Movement()
 {
@@ -87,15 +93,18 @@ void Player::Movement()
 	{
 		vector.x += -2.0f;
 		flip_flag = TRUE;
+		direction = -1;
 	}
 	else if (InputControl::GetKey(KEY_INPUT_RIGHT))
 	{
 		vector.x += 2.0f;
 		flip_flag = FALSE;
+		direction = 1;
 	}
 	else
 	{
 		vector.x += 0.0f;
+		direction = 0;
 	}
 	
 	//壁の処理
@@ -122,7 +131,7 @@ void Player::Movement()
 		vector.y += 0.0f;
 	}
 	
-	//現在の位置座標に速さを加算する
+	//現在の位置座標を更新する
 	location += vector;
 }
 

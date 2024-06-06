@@ -14,7 +14,7 @@ private:
 	float speed;				//移動速度
 	int type;					//敵のタイプ
 	bool Is_hit;				//ボムに当たったか
-	Player* player;				//プレイヤーのポインター
+	Player* player;				//プレイヤーのポインタ
 
 public:
 	Enemy();

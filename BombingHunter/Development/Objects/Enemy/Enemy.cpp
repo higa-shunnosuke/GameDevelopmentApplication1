@@ -72,7 +72,7 @@ void Enemy::Initialize(int e_type)
 		animation[3] = LoadGraph("Resource/Images/Gorld-enemy/4.png");
 		animation[4] = LoadGraph("Resource/Images/Gorld-enemy/5.png");
 		//大きさの設定
-		box_size = 50.0f;
+		box_size = 40.0f;
 		//移動速度の設定
 		speed = 2.5f;
 		//敵のタイプの設定
@@ -207,7 +207,7 @@ int Enemy::GetType()
 //移動処理
 void Enemy::Movement()
 {
-	//現在の位置座標に速さを加算する
+	//現在の位置座標を更新する
 	location += vector;
 }
 

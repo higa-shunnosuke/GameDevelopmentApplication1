@@ -15,6 +15,8 @@ private:
 	float LocationY[4];		//ŒÅ’èYÀ•W
 	int image;				//”wŒi‰æ‘œ
 	int Enemy_count[4];		//“G‚ÌoŒ»”
+	int Bomb_count;			//ƒ{ƒ€‚Ì”
+
 
 public:
 	Scene();

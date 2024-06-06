@@ -2,6 +2,7 @@
 
 #include"../GameObject.h"
 #include"../Player/Player.h"
+#include "Explosion.h"
 
 class Bomb :public GameObject
 {
@@ -11,8 +12,9 @@ private:
 	int animation_max;			//アニメーション画像の枚数
 	int count;					//アニメーション画像のカウント
 	Vector2D vector;			//移動方向
-	Player* player;
 	bool Is_hit;				//ヒットしたか
+	Player* player;				//プレイヤーのポインタ
+	Explosion* explosion;		//爆発のポインタ
 
 public:
 	Bomb();

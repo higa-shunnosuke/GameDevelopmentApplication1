@@ -9,6 +9,7 @@ private:
 	int frame_count;		//アニメーション時間
 	int flip_flag;			//反転フラグ
 	bool Is_hit;			//弾に当たったか
+	int direction;			//向き
 
 public:
 	Player();
@@ -24,6 +25,8 @@ public:
 
 	//位置情報取得処理
 	Vector2D GetLocation() const;
+	//向き取得処理
+	int GetDirection() const;
 
 private:
 	//移動処理
