@@ -5,6 +5,17 @@
 #include"random"
 #include"../Objects/GameObject.h"
 
+typedef enum {
+	PLAYER,
+	BOMB,
+	EXPLOSION,
+	HARPY,
+	FLY_ENEMY,
+	BOX_ENEMY,
+	GORLD_ENEMY,
+	BULLET,
+} TYPE;
+
 class Scene
 {
 private:
@@ -33,7 +44,7 @@ private:
 
 	//オブジェクト生成処理
 	template <class T>
-	T* CreateObject(const Vector2D& location,int type)
+	T* CreateObject(const Vector2D& location,int object_type)
 	{
 		//インスタンスを生成する
 		T* new_instance = new T();
@@ -51,7 +62,7 @@ private:
 		new_object->SetLocation(location);
 
 		//初期化処理
-		new_object->Initialize(type);
+		new_object->Initialize(object_type);
 
 		//オブジェクトリストに追加
 		objects.push_back(new_object);

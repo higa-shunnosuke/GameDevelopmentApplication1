@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "../Objects/Player/Player.h"
 #include "../Objects/Player/Bomb.h"
+#include "../Objects/Player/Explosion.h"
 #include "../Objects/Enemy/Enemy.h"
 #include "../Objects/Enemy/Bullet.h"
 #include "../Utility/InputControl.h"
@@ -8,7 +9,6 @@
 
 bool Is_pause;		//ポーズフラグ
 Player* p;			//プレイヤーのポインタ
-Bomb* b;			//ボムのポインタ
 
 //コンストラクタ
 Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
@@ -45,7 +45,7 @@ void Scene::Initialize()
 	image = LoadGraph("Resource/Images/background.png");
 
 	//プレイヤーを生成する
-	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),0);
+	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),TYPE::PLAYER);
 
 	//敵の出現数の設定
 	Enemy_count[0] = 0;
@@ -111,8 +111,8 @@ void Scene::Update()
 			{
 				if (GetRand(100) <= 40)
 				{
-					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), 0);
-					Enemy_count[0] += 1;
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
+					Enemy_count[TYPE::HARPY - 3] += 1;
 				}
 			}
 		}
@@ -124,8 +124,8 @@ void Scene::Update()
 				//生成する確率を調整
 				if (GetRand(100) <= 20)
 				{
-					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), 1);
-					Enemy_count[1] += 1;
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), TYPE::FLY_ENEMY);
+					Enemy_count[TYPE::FLY_ENEMY - 3] += 1;
 					frame_count = 0;
 				}
 			}
@@ -136,8 +136,8 @@ void Scene::Update()
 			//生成する確率を調整
 			if (GetRand(100) <= 50)
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 2);
-				Enemy_count[2] += 1;
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::BOX_ENEMY);
+				Enemy_count[TYPE::BOX_ENEMY - 3] += 1;
 			}
 		}
 		//金のテキを生成する
@@ -146,8 +146,8 @@ void Scene::Update()
 			//生成する確率を調整
 			if (GetRand(100) <= 1)
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), 3);
-				Enemy_count[3] += 1;
+				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::GORLD_ENEMY);
+				Enemy_count[TYPE::GORLD_ENEMY - 3] += 1;
 			}
 		}
 		
@@ -156,8 +156,7 @@ void Scene::Update()
 		{
 			if (Bomb_count < 1)
 			{
-				b = CreateObject<Bomb>(objects[0]->GetLocation(), 0);
-				b->SetPlayer(p);
+				CreateObject<Bomb>(objects[0]->GetLocation(), TYPE::BOMB)->SetPlayer(p);
 				Bomb_count++;
 			}
 		}
@@ -184,14 +183,18 @@ void Scene::Update()
 			//削除判定チェック処理
 			if (objects[i]->Delete() == true)
 			{
-				if (objects[i] != b)
+				if (objects[i]->GetType() != TYPE::BOMB && objects[i]->GetType() != TYPE::EXPLOSION)
 				{
-					Enemy_count[objects[i]->GetType()]--;
+					Enemy_count[objects[i]->GetType() - 3 ]--;
 				}
-				else
+				else if (objects[i]->GetType() != TYPE::EXPLOSION)
 				{
 					Bomb_count--;
+
+					//爆破エフェクトの生成
+					CreateObject<Explosion>(objects[i]->GetLocation(), TYPE::EXPLOSION);
 				}
+				//オブジェクトの削除
 				objects.erase(objects.begin() + i);
 			}
 		}
@@ -212,10 +215,12 @@ void Scene::Draw() const
 
 	for (int i = 0; i < 4; i++)
 	{
-		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
+		DrawFormatString(10, 10 + i * 20, 0xff, "カウント%d：%d",i, Enemy_count[i]);
 	}
-	DrawFormatString(10, 90, 0x00, "フレーム：%d", frame_count);
-	DrawFormatString(10, 110, 0x00, "時間：%d", time);
+	DrawFormatString(10, 90, 0xff, "フレーム：%d", frame_count);
+	DrawFormatString(10, 110, 0xff, "時間：%d", time);
+	DrawFormatString(10, 130, 0xff, "Bomb：%d", Bomb_count);
+
 
 }
 

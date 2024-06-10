@@ -13,12 +13,13 @@ protected:
 	double radian;		//向き
 	int image;			//描画する画像
 	int sound;			//再生する音源
+	int type;			//オブジェクトのタイプ
 
 public:
 	GameObject();
 	virtual ~GameObject();
 
-	virtual void Initialize(int type);//初期化処理
+	virtual void Initialize(int object_type);//初期化処理
 	virtual void Update();		//更新処理
 	virtual void Draw() const;	//描画処理
 	virtual void Finalize();	//終了時処理

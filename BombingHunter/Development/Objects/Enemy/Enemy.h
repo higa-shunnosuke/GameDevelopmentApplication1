@@ -12,15 +12,14 @@ private:
 	int count;					//アニメーション画像のカウント
 	Vector2D vector;			//移動方向
 	float speed;				//移動速度
-	int type;					//敵のタイプ
 	bool Is_hit;				//ボムに当たったか
 	Player* player;				//プレイヤーのポインタ
-
+	
 public:
 	Enemy();
 	~Enemy();
 
-	virtual void Initialize(int type) override;	//初期化処理
+	virtual void Initialize(int object_type) override;	//初期化処理
 	virtual void Update() override;		//更新処理
 	virtual void Draw() const override;	//描画処理
 	virtual void Finalize() override;	//終了時処理
@@ -32,7 +31,7 @@ public:
 	//プレイヤーのポインタを受け取る
 	virtual void SetPlayer(class Player* player);
 	//タイプ取得処理
-	int GetType();
+	virtual int GetType() override;
 
 private:
 	//移動処理

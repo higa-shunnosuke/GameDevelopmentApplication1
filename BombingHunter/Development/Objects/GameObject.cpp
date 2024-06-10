@@ -19,9 +19,9 @@ GameObject::~GameObject()
 }
 
 //初期化処理
-void GameObject::Initialize(int type)
+void GameObject::Initialize(int object_type)
 {
-
+	type = object_type;
 }
 
 //更新所理
@@ -66,7 +66,7 @@ bool GameObject::Delete()
 //タイプ取得処理
 int GameObject::GetType()
 {
-	return 0;
+	return this->type;
 }
 
 //位置情報取得処理

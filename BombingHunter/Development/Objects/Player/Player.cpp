@@ -15,7 +15,7 @@ Player::~Player()
 {}
 
 //初期化処理
-void Player::Initialize(int player_type)
+void Player::Initialize(int object_type)
 {
 	//画像の読み込み
 	animation[0] = LoadGraph("Resource/Images/Tri-pilot/1.png");
@@ -35,6 +35,9 @@ void Player::Initialize(int player_type)
 
 	//初期画像の設定
 	image = animation[0];
+
+	//オブジェクトタイプの設定
+	type = object_type;
 }
 
 //更新処理
@@ -80,6 +83,12 @@ Vector2D Player::GetLocation() const
 int Player::GetDirection() const
 {
 	return this->direction;
+}
+
+//タイプ取得処理
+int Player::GetType()
+{
+	return this->type;
 }
 
 //移動処理

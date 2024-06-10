@@ -18,7 +18,7 @@ Bullet::~Bullet()
 {}
 
 //初期化処理
-void Bullet::Initialize(int e_type)
+void Bullet::Initialize(int object_type)
 {
 	//画像の読み込み
 	animation[0] = LoadGraph("Resource/Images/bullet/1.png");
@@ -43,10 +43,13 @@ void Bullet::Initialize(int e_type)
 		}
 	}
 
-	//初期画像の設定
+	//初期画像の初期化
 	image = animation[0];
 
-	//移動速度の設定
+	//オブジェクトタイプの初期化
+	type = object_type;
+
+	//移動速度の初期化
 	vector = Vector2D(0.1f, 0.0f);
 
 }
@@ -64,7 +67,7 @@ void Bullet::Update()
 //描画処理
 void Bullet::Draw() const
 {
-	//プレイヤー画像の描画
+	//バレット画像の描画
 	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, 0);
 
 	__super::Draw();
@@ -113,6 +116,12 @@ bool Bullet::Delete()
 void Bullet::SetPlayer(Player* player)
 {
 	this->player = player;
+}
+
+//タイプ取得処理
+int Bullet::GetType()
+{
+	return this->type;
 }
 
 //移動処理

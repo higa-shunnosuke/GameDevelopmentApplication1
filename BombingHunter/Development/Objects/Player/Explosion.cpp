@@ -2,7 +2,7 @@
 #include "DxLib.h"
 
 //コンストラクタ
-Explosion::Explosion(Vector2D location) :frame_count(0), animation_max(0), count(0)
+Explosion::Explosion() :frame_count(0), animation_max(0), count(0), radian(0.0f), Is_anim(false)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -17,7 +17,7 @@ Explosion::~Explosion()
 }
 
 //初期化処理
-void Explosion::Initialize(int e_type)
+void Explosion::Initialize(int object_type)
 {
 	//画像の読み込み
 //画像の読み込み
@@ -26,7 +26,7 @@ void Explosion::Initialize(int e_type)
 	animation[2] = LoadGraph("Resource/Images/Explosion/3.png");
 
 	//エラーチェック
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (animation[i] == -1)
 		{
@@ -38,8 +38,14 @@ void Explosion::Initialize(int e_type)
 		}
 	}
 
+	//大きさの設定
+	box_size = 0.0f;
+
 	//初期画像の初期化
 	image = animation[0];
+
+	//オブジェクトタイプの設定
+	type = object_type;
 
 	//向きの初期化
 	radian = 0;
@@ -56,7 +62,7 @@ void Explosion::Update()
 //描画処理
 void Explosion::Draw() const
 {
-	//プレイヤー画像の描画
+	//爆破エフェクト画像の描画
 	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, 0);
 
 }
@@ -65,10 +71,30 @@ void Explosion::Draw() const
 void Explosion::Finalize()
 {
 	//使用した画像を開放する
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		DeleteGraph(animation[i]);
 	}
+}
+
+// 削除判定通知処理
+bool Explosion::Delete()
+{
+	bool ret = false;
+
+	//アニメーションが終了したら
+	if (Is_anim == true)
+	{
+		ret = true;
+	}
+
+	return ret;
+}
+
+//タイプ取得処理
+int Explosion::GetType()
+{
+	return this->type;
 }
 
 //アニメーション制御
@@ -78,7 +104,7 @@ void Explosion::AnimeControl()
 	frame_count++;
 
 	//６０フレーム目に到達したら
-	if (frame_count >= 60)
+	if (frame_count >= 30)
 	{
 		//カウントのリセット
 		frame_count = 0;
@@ -87,7 +113,8 @@ void Explosion::AnimeControl()
 		if (image == animation[animation_max - 1])
 		{
 			count = 0;
-			image = animation[count];
+			//アニメーション終了
+			Is_anim = true;
 		}
 		else
 		{
@@ -95,4 +122,5 @@ void Explosion::AnimeControl()
 			image = animation[count];
 		}
 	}
+
 }

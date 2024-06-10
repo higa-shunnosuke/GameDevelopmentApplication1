@@ -2,7 +2,7 @@
 #include"DxLib.h"
 
 //コンストラクタ
-Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),type(0), Is_hit(false)
+Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f), Is_hit(false)
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -19,11 +19,11 @@ Enemy::~Enemy()
 }
 
 //初期化処理
-void Enemy::Initialize(int e_type)
+void Enemy::Initialize(int object_type)
 {
-	switch (e_type)
+	switch (object_type)
 	{
-	case 0:
+	case 3:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Harpy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Harpy/2.png");
@@ -35,9 +35,9 @@ void Enemy::Initialize(int e_type)
 		//移動速度の設定
 		speed = 1.0f + (float)GetRand(1);
 		//敵のタイプの設定
-		type = e_type;
+		type = object_type;
 		break;
-	case 1:
+	case 4:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
@@ -49,8 +49,8 @@ void Enemy::Initialize(int e_type)
 		//移動速度の設定
 		speed = 2.0f + (float)GetRand(2);
 		//敵のタイプの設定
-		type = e_type;		break;
-	case 2:
+		type = object_type;		break;
+	case 5:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Box-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Box-enemy/2.png");
@@ -62,9 +62,9 @@ void Enemy::Initialize(int e_type)
 		//移動速度の設定
 		speed = 2.0f;
 		//敵のタイプの設定
-		type = e_type;
+		type = object_type;
 		break;
-	case 3:
+	case 6:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Gorld-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Gorld-enemy/2.png");
@@ -76,7 +76,7 @@ void Enemy::Initialize(int e_type)
 		//移動速度の設定
 		speed = 2.5f;
 		//敵のタイプの設定
-		type = e_type;
+		type = object_type;
 		break;
 	default:
 		break;
@@ -142,7 +142,7 @@ void Enemy::Draw() const
 		flip_flag = TRUE;
 	}
 
-	//プレイヤー画像の描画
+	//エネミー画像の描画
 	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
 
 	__super::Draw();
@@ -162,15 +162,23 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	Is_hit = true;
 
-	//vector.x = 0.0f;
-	//vector.y = 1.0f;
-
-	/*for (int i = 0; i < 10; i++)
+	if (hit_object->GetType() > 1)
 	{
-		vector.x *= -1;
-	}*/
+		Is_hit = false;
+	}
+	else
+	{
+		/*vector.x = 1.0f;
+		vector.y = 1.0f;
+
+		for (int i = 0; i < 10; i++)
+		{
+			vector.x *= -1;
+		}*/
+
+		Is_hit = true;
+	}
 }
 
 //削除判定通知処理
@@ -179,11 +187,11 @@ bool Enemy::Delete()
 	bool ret = false;
 
 	//壁で反射する
-	if (location.x > 640.0f + box_size.x)
+	if (location.x > 640.0f + box_size.x || Is_hit == true)
 	{
 		ret = true;
 	}
-	if (location.x < 0.0f - box_size.x)
+	if (location.x < 0.0f - box_size.x || Is_hit == true)
 	{
 		ret = true;
 	}
@@ -201,7 +209,7 @@ void Enemy::SetPlayer(Player* player)
 //タイプ取得処理
 int Enemy::GetType()
 {
-	return type;
+	return this->type;
 }
 
 //移動処理

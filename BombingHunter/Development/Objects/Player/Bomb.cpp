@@ -5,7 +5,6 @@
 //コンストラクタ
 Bomb::Bomb() :frame_count(0), animation_max(0), count(0), vector(0.0f), Is_hit(false)
 {
-	
 	animation[0] = NULL;
 
 	player = nullptr;
@@ -17,7 +16,7 @@ Bomb::~Bomb()
 {}
 
 //初期化処理
-void Bomb::Initialize(int e_type)
+void Bomb::Initialize(int object_type)
 {
 	//画像の読み込み
 	animation[0] = LoadGraph("Resource/Images/Bomb/1.png");
@@ -33,6 +32,9 @@ void Bomb::Initialize(int e_type)
 	
 	//初期画像の初期化
 	image = animation[0];
+
+	//オブジェクトタイプの初期化
+	type = object_type;
 
 	//向きの初期化
 	radian = 0;
@@ -52,10 +54,8 @@ void Bomb::Update()
 //描画処理
 void Bomb::Draw() const
 {
-	//プレイヤー画像の描画
+	//ボム画像の描画
 	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, 0);
-
-	DrawFormatString(10, 130, 0x00, "hit：%d", Is_hit);
 
 	__super::Draw();
 }
@@ -73,7 +73,7 @@ void Bomb::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
 
-	if (hit_object == player)
+	if (hit_object->GetType() < 3)
 	{
 		Is_hit = false;
 	}
@@ -92,18 +92,15 @@ bool Bomb::Delete()
 	if (location.y > 350.0f + box_size.y || Is_hit == true)
 	{
 		ret = true;
-
-		if (explosion == nullptr)
-		{
-			explosion = new Explosion(location);
-		}
-		if (explosion != nullptr)
-		{
-			explosion->Update();
-		}
 	}
 
 	return ret;
+}
+
+//タイプ取得処理
+int Bomb::GetType()
+{
+	return this->type;
 }
 
 //プレイヤーのポインタを受け取る、ついでに進行方向を設定する
@@ -115,17 +112,17 @@ void Bomb::SetPlayer(Player* player)
 	if (player->GetDirection() == 0)
 	{
 		radian = 1.5707963267949;	//90°
-		vector = Vector2D(0.0f, 2.0f);
+		vector = Vector2D(0.0f, 2.5f);
 	}
 	else if (player->GetDirection() == 1)
 	{
 		radian = 0.78539816339745;	//45°
-		vector = Vector2D(2.5f);
+		vector = Vector2D(3.0f);
 	}
 	else
 	{
 		radian = 2.3561944901923;	//135°
-		vector = Vector2D(-2.5f, 2.5f);
+		vector = Vector2D(-3.0f, 3.0f);
 	}
 }
 
