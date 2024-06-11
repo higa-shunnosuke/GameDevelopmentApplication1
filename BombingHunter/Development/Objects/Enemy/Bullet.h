@@ -6,12 +6,14 @@
 class Bullet :public GameObject
 {
 private:
-	int animation[5];			//アニメーション画像
-	int frame_count;			//アニメーション時間
-	int animation_max;			//アニメーション画像の枚数
-	int count;					//アニメーション画像のカウント
-	Vector2D vector;			//移動方向
-	Player* player;				//プレイヤーのポインター
+	int animation[5];		//アニメーション画像
+	int frame_count;		//アニメーション時間
+	int animation_max;		//アニメーション画像の枚数
+	int count;				//アニメーション画像のカウント
+	Vector2D vector;		//移動方向
+	bool Is_hit;			//ヒットしたか
+	bool Is_anim;			//アニメーション終了フラグ
+	Player* player;			//プレイヤーのポインタ
 
 public:
 	Bullet();

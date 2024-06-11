@@ -73,7 +73,7 @@ void Bomb::OnHitCollision(GameObject* hit_object)
 {
 	//“–‚½‚Á‚½Žž‚Ìˆ—
 
-	if (hit_object->GetType() < 3)
+	if (hit_object->GetType() < 4)
 	{
 		Is_hit = false;
 	}

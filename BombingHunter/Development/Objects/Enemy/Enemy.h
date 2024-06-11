@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../Scene/Scene.h"
 #include"../GameObject.h"
 #include"../Player/Player.h"
 

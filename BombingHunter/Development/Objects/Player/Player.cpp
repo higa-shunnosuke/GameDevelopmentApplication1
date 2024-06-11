@@ -31,7 +31,7 @@ void Player::Initialize(int object_type)
 	radian = 0.0;
 
 	//‘å‚«‚³‚Ìİ’è
-	box_size = 64.0f;
+	box_size = 60.0f;
 
 	//‰Šú‰æ‘œ‚Ìİ’è
 	image = animation[0];

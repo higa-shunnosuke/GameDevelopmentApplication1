@@ -10,6 +10,7 @@
 bool Is_pause;		//ポーズフラグ
 Player* p;			//プレイヤーのポインタ
 
+
 //コンストラクタ
 Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
 {
@@ -69,7 +70,7 @@ void Scene::Update()
 	//ポーズ状態のとき
 	if (Is_pause == true)
 	{
-		//スペースキーを押すとポーズを解除する
+		//Zキーを押すとポーズを解除する
 		if (InputControl::GetKeyDown(KEY_INPUT_Z))
 		{
 			Is_pause = false;
@@ -85,7 +86,7 @@ void Scene::Update()
 	//ポーズ状態じゃないのとき
 	else
 	{
-		//スペースキーを押すとポーズにする
+		//Zキーを押すとポーズにする
 		if (InputControl::GetKeyDown(KEY_INPUT_Z))
 		{
 			Is_pause = true;
@@ -95,10 +96,11 @@ void Scene::Update()
 		frame_count++;
 
 		//６０フレーム目に到達したら
-		if (frame_count % 60 == 0)
+		if (frame_count == 60)
 		{
 			//カウントのリセット
 			time--;
+			frame_count = 0;
 		}
 
 		//それぞれのエネミーを出現数の上限まで生成する
@@ -106,27 +108,28 @@ void Scene::Update()
 		//生成を１秒待ってハーピーが重ならないようにする
 		if (Enemy_count[0] < 2)
 		{
-			//生成する確率を調整
-			if (frame_count % 60 == 0)
+			//生成する間隔をあける
+			if (frame_count == 0)
 			{
+				//生成する確率を調整
 				if (GetRand(100) <= 40)
 				{
 					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
-					Enemy_count[TYPE::HARPY - 3] += 1;
+					Enemy_count[TYPE::HARPY - 4] += 1;
 				}
 			}
 		}
 		//ハネテキを生成する
 		if (Enemy_count[1] < 5)
 		{
-			if (frame_count / 60 >= Enemy_count[1])
+			//生成する間隔をあける
+			if (frame_count == 0)
 			{
 				//生成する確率を調整
-				if (GetRand(100) <= 20)
+				if (GetRand(100) <= 50)
 				{
 					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(2)]), TYPE::FLY_ENEMY);
-					Enemy_count[TYPE::FLY_ENEMY - 3] += 1;
-					frame_count = 0;
+					Enemy_count[TYPE::FLY_ENEMY - 4] += 1;
 				}
 			}
 		}
@@ -134,10 +137,10 @@ void Scene::Update()
 		if (Enemy_count[2] < 1)
 		{
 			//生成する確率を調整
-			if (GetRand(100) <= 50)
+			if (GetRand(100) <= 20)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::BOX_ENEMY);
-				Enemy_count[TYPE::BOX_ENEMY - 3] += 1;
+				Enemy_count[TYPE::BOX_ENEMY - 4] += 1;
 			}
 		}
 		//金のテキを生成する
@@ -147,11 +150,27 @@ void Scene::Update()
 			if (GetRand(100) <= 1)
 			{
 				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::GORLD_ENEMY);
-				Enemy_count[TYPE::GORLD_ENEMY - 3] += 1;
+				Enemy_count[TYPE::GORLD_ENEMY - 4] += 1;
 			}
 		}
-		
-		//Zキーが押されたら、ボムを生成する
+		//弾を生成する
+		for (int i = 0; i < objects.size(); i++)
+		{
+			if (objects[i]->GetType() == TYPE::BOX_ENEMY)
+			{
+				//生成する間隔をあける
+				if (frame_count == 0)
+				{
+					//生成する確率を調整
+					if (GetRand(10) <= 3)
+					{
+						CreateObject<Bullet>(Vector2D(objects[i]->GetLocation()), TYPE::BULLET)->SetPlayer(p);
+					}
+				}
+			}
+		}
+
+		//スペースキーが押されたら、ボムを生成する
 		if (InputControl::GetKeyDown(KEY_INPUT_SPACE))
 		{
 			if (Bomb_count < 1)
@@ -183,11 +202,11 @@ void Scene::Update()
 			//削除判定チェック処理
 			if (objects[i]->Delete() == true)
 			{
-				if (objects[i]->GetType() != TYPE::BOMB && objects[i]->GetType() != TYPE::EXPLOSION)
+				if (objects[i]->GetType() >  3)
 				{
-					Enemy_count[objects[i]->GetType() - 3 ]--;
+					Enemy_count[objects[i]->GetType() - 4 ]--;
 				}
-				else if (objects[i]->GetType() != TYPE::EXPLOSION)
+				else if (objects[i]->GetType() == TYPE::BOMB)
 				{
 					Bomb_count--;
 
@@ -215,11 +234,10 @@ void Scene::Draw() const
 
 	for (int i = 0; i < 4; i++)
 	{
-		DrawFormatString(10, 10 + i * 20, 0xff, "カウント%d：%d",i, Enemy_count[i]);
+		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
 	}
-	DrawFormatString(10, 90, 0xff, "フレーム：%d", frame_count);
-	DrawFormatString(10, 110, 0xff, "時間：%d", time);
-	DrawFormatString(10, 130, 0xff, "Bomb：%d", Bomb_count);
+	DrawFormatString(10, 90, 0x00, "フレーム：%d", frame_count);
+	DrawFormatString(10, 110, 0x00, "時間：%d", time);
 
 
 }

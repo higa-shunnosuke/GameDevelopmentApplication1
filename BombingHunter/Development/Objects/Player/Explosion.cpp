@@ -104,7 +104,7 @@ void Explosion::AnimeControl()
 	frame_count++;
 
 	//６０フレーム目に到達したら
-	if (frame_count >= 30)
+	if (frame_count >= 10)
 	{
 		//カウントのリセット
 		frame_count = 0;

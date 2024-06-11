@@ -9,11 +9,11 @@ typedef enum {
 	PLAYER,
 	BOMB,
 	EXPLOSION,
+	BULLET,
 	HARPY,
 	FLY_ENEMY,
 	BOX_ENEMY,
 	GORLD_ENEMY,
-	BULLET,
 } TYPE;
 
 class Scene

@@ -1,4 +1,5 @@
 #include"Enemy.h"
+#include "Bullet.h"
 #include"DxLib.h"
 
 //コンストラクタ
@@ -23,7 +24,7 @@ void Enemy::Initialize(int object_type)
 {
 	switch (object_type)
 	{
-	case 3:
+	case 4:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Harpy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Harpy/2.png");
@@ -37,7 +38,7 @@ void Enemy::Initialize(int object_type)
 		//敵のタイプの設定
 		type = object_type;
 		break;
-	case 4:
+	case 5:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Fly-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Fly-enemy/2.png");
@@ -50,7 +51,7 @@ void Enemy::Initialize(int object_type)
 		speed = 2.0f + (float)GetRand(2);
 		//敵のタイプの設定
 		type = object_type;		break;
-	case 5:
+	case 6:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Box-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Box-enemy/2.png");
@@ -64,7 +65,7 @@ void Enemy::Initialize(int object_type)
 		//敵のタイプの設定
 		type = object_type;
 		break;
-	case 6:
+	case 7:
 		//画像の読み込み
 		animation[0] = LoadGraph("Resource/Images/Gorld-enemy/1.png");
 		animation[1] = LoadGraph("Resource/Images/Gorld-enemy/2.png");
@@ -162,7 +163,6 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-
 	if (hit_object->GetType() > 1)
 	{
 		Is_hit = false;
