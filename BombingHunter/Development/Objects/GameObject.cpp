@@ -7,7 +7,8 @@ GameObject::GameObject() :
 	box_size(0.0f),
 	radian(0.0),
 	image(NULL),
-	sound(NULL)
+	sound(NULL),
+	type(0)
 {
 
 }

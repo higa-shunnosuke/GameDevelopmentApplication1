@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "math.h"
 
+
 //コンストラクタ
 Bullet::Bullet() :frame_count(0), animation_max(0), count(0), vector(0.0), Is_hit(false), Is_anim(false)
 {
@@ -11,6 +12,9 @@ Bullet::Bullet() :frame_count(0), animation_max(0), count(0), vector(0.0), Is_hi
 	}
 	//ポインタの初期化
 	player = nullptr;
+
+	//角度の初期化
+	radian = 0.0f;
 }
 
 //デストラクタ
@@ -42,14 +46,15 @@ void Bullet::Initialize(int object_type)
 		}
 	}
 
-	//初期画像の初期化
+	//初期画像の設定
 	image = animation[0];
 
 	//オブジェクトタイプの初期化
 	type = object_type;
 
 	//移動速度の初期化
-	vector = Vector2D(0.0f, 0.0f);
+	vector = Vector2D(0.0f);
+
 }
 
 //更新処理
@@ -85,11 +90,7 @@ void Bullet::Finalize()
 void Bullet::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	if (hit_object->GetType() > 0)
-	{
-		Is_hit = false;
-	}
-	else
+	if (hit_object->GetType() == 0)
 	{
 		Is_hit = true;
 
@@ -103,7 +104,7 @@ bool Bullet::Delete()
 {
 	bool ret = false;
 
-	//画面外に行ったら
+	//画面外に行ったら,アニメーションが終わったら
 	if (location.y < 0.0f || Is_anim == true)
 	{
 		ret = true;
@@ -117,8 +118,13 @@ void Bullet::SetPlayer(Player* player)
 {
 	this->player = player;
 
-	vector.x = -1.0f * cos(atan(player->GetLocation().x));
-	vector.y = -1.0f * sin(atan(player->GetLocation().y));
+	//プレイヤーとの距離を取得
+	Vector2D deff = player->GetLocation() - location;
+	
+	//プレイヤーまでの角度を算出
+	radian = atan2f(deff.y, deff.x);
+	vector = Vector2D(cosf(radian), sinf(radian));
+
 }
 
 //タイプ取得処理
@@ -130,8 +136,11 @@ int Bullet::GetType()
 //移動処理
 void Bullet::Movement()
 {
-	//現在の位置座標に速さを加算する
-	location += vector;
+	if (Is_hit != true)
+	{
+		//現在の位置座標に速さを加算する
+		location += vector;
+	}
 }
 
 //アニメーション制御

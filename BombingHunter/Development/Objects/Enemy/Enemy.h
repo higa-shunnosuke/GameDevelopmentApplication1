@@ -7,14 +7,16 @@
 class Enemy :public GameObject
 {
 private:
-	int animation[5];			//アニメーション画像
-	int frame_count;			//アニメーション時間
-	int animation_max;			//アニメーション画像の枚数
-	int count;					//アニメーション画像のカウント
-	Vector2D vector;			//移動方向
-	float speed;				//移動速度
-	bool Is_hit;				//ボムに当たったか
-	Player* player;				//プレイヤーのポインタ
+	int animation[5];		//アニメーション画像
+	int frame_count;		//アニメーション時間
+	int animation_max;		//アニメーション画像の枚数
+	int count;				//アニメーション画像のカウント
+	Vector2D vector;		//移動方向
+	float speed;			//移動速度
+	bool Is_hit;			//ボムに当たったか
+	bool Is_death;			//死んだか
+	Player* player;			//プレイヤーのポインタ
+	int BlendMode;			//ブレンド値
 	
 public:
 	Enemy();

@@ -2,8 +2,9 @@
 #include "Bullet.h"
 #include"DxLib.h"
 
+
 //コンストラクタ
-Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f), Is_hit(false)
+Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f), Is_hit(false), Is_death(false)
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -11,6 +12,8 @@ Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0
 	}
 
 	player = nullptr;
+	BlendMode = 255;
+
 }
 
 //デストラクタ
@@ -121,11 +124,9 @@ void Enemy::Update()
 	Movement();
 
 	//ボムに当たるまで
-	if (Is_hit != true)
-	{
-		//アニメーション制御
-		AnimeControl();
-	}
+	
+	//アニメーション制御
+	AnimeControl();
 }
 
 //描画処理
@@ -143,8 +144,17 @@ void Enemy::Draw() const
 		flip_flag = TRUE;
 	}
 
+	if (Is_hit == true)
+	{
+		//描画モードをアルファブレンドにする
+		SetDrawBlendMode(DX_BLENDGRAPHTYPE_ALPHA, BlendMode);
+	}
+
 	//エネミー画像の描画
 	DrawRotaGraphF(location.x, location.y, 0.7, radian, image, TRUE, flip_flag);
+
+	//描画モードをノーブレンドにする
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	__super::Draw();
 }
@@ -163,21 +173,10 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
-	if (hit_object->GetType() > 1)
+	if (hit_object->GetType() < 2)
 	{
-		Is_hit = false;
-	}
-	else
-	{
-		/*vector.x = 1.0f;
-		vector.y = 1.0f;
-
-		for (int i = 0; i < 10; i++)
-		{
-			vector.x *= -1;
-		}*/
-
 		Is_hit = true;
+		vector = Vector2D(1.0f,1.0f);
 	}
 }
 
@@ -186,15 +185,12 @@ bool Enemy::Delete()
 {
 	bool ret = false;
 
-	//壁で反射する
-	if (location.x > 640.0f + box_size.x || Is_hit == true)
+	//画面外に行ったら、死んだら
+	if (location.x > 640.0f + box_size.x || location.x < 0.0f - box_size.x || Is_death == true)
 	{
 		ret = true;
 	}
-	if (location.x < 0.0f - box_size.x || Is_hit == true)
-	{
-		ret = true;
-	}
+	
 
 	return ret;
 }
@@ -204,7 +200,6 @@ void Enemy::SetPlayer(Player* player)
 {
 	this->player = player;
 }
-
 
 //タイプ取得処理
 int Enemy::GetType()
@@ -225,22 +220,38 @@ void Enemy::AnimeControl()
 	//フレームカウントを加算する
 	frame_count++;
 
-	//６０フレーム目に到達したら
-	if (frame_count >= 60)
+	if (Is_hit != true)
 	{
-		//カウントのリセット
-		frame_count = 0;
-
-		//画像の切り替え
-		if (image == animation[animation_max-1])
+		//６０フレーム目に到達したら
+		if (frame_count >= 60)
 		{
-			count = 0;
-			image = animation[count];
+			//カウントのリセット
+			frame_count = 0;
+
+			//画像の切り替え
+			if (image == animation[animation_max - 1])
+			{
+				count = 0;
+				image = animation[count];
+			}
+			else
+			{
+				count++;
+				image = animation[count];
+			}
+		}
+	}
+	else if(frame_count % 5  == 0)
+	{
+		vector.x *= -1.0f;
+
+		if (BlendMode <= 0)
+		{
+			Is_death = true;
 		}
 		else
 		{
-			count++;
-			image = animation[count];
+			BlendMode -= 50;
 		}
 	}
 }

@@ -72,12 +72,7 @@ void Bomb::Finalize()
 void Bomb::OnHitCollision(GameObject* hit_object)
 {
 	//“–‚½‚Á‚½‚Ìˆ—
-
-	if (hit_object->GetType() < 4)
-	{
-		Is_hit = false;
-	}
-	else
+	if (hit_object->GetType() > 3)
 	{
 		Is_hit = true;
 	}
@@ -141,7 +136,7 @@ void Bomb::Movement()
 		vector.x = 0.0f;
 	}
 
-	//“G‚É“–‚½‚Á‚½‚ç‚»‚Ìê‚Å~‚Ü‚é
+	////“G‚É“–‚½‚Á‚½‚ç‚»‚Ìê‚Å~‚Ü‚é
 	if (Is_hit == true)
 	{
 		vector = Vector2D(0.0f);

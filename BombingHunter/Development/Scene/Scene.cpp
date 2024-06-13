@@ -202,11 +202,11 @@ void Scene::Update()
 			//削除判定チェック処理
 			if (objects[i]->Delete() == true)
 			{
-				if (objects[i]->GetType() >  3)
+				if (objects[i]->GetType() > 3)
 				{
 					Enemy_count[objects[i]->GetType() - 4 ]--;
 				}
-				else if (objects[i]->GetType() == TYPE::BOMB)
+				else if (objects[i]->GetType() == 1)
 				{
 					Bomb_count--;
 
@@ -238,7 +238,6 @@ void Scene::Draw() const
 	}
 	DrawFormatString(10, 90, 0x00, "フレーム：%d", frame_count);
 	DrawFormatString(10, 110, 0x00, "時間：%d", time);
-
 
 }
 
