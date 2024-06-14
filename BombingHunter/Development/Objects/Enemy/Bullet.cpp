@@ -93,7 +93,8 @@ void Bullet::OnHitCollision(GameObject* hit_object)
 	if (hit_object->GetType() == 0)
 	{
 		Is_hit = true;
-
+		//“–‚½‚è”»’è‚ğ‚È‚­‚·
+		box_size = Vector2D(0.0f);
 		//’e‚Ì“®‚«‚ğ~‚ß‚é
 		vector = Vector2D(0.0f);
 	}
@@ -123,7 +124,7 @@ void Bullet::SetPlayer(Player* player)
 	
 	//ƒvƒŒƒCƒ„[‚Ü‚Å‚ÌŠp“x‚ğZo
 	radian = atan2f(deff.y, deff.x);
-	vector = Vector2D(cosf(radian), sinf(radian));
+	vector = Vector2D(2.f*cosf(radian), 2.f*sinf(radian));
 
 }
 

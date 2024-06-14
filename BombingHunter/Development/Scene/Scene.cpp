@@ -136,21 +136,29 @@ void Scene::Update()
 		//ハコテキを生成する
 		if (Enemy_count[2] < 1)
 		{
-			//生成する確率を調整
-			if (GetRand(100) <= 20)
+			//生成する間隔をあける
+			if (frame_count == 0)
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::BOX_ENEMY);
-				Enemy_count[TYPE::BOX_ENEMY - 4] += 1;
+				//生成する確率を調整
+				if (GetRand(100) <= 20)
+				{
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::BOX_ENEMY);
+					Enemy_count[TYPE::BOX_ENEMY - 4] += 1;
+				}
 			}
 		}
 		//金のテキを生成する
 		if (Enemy_count[3] < 1)
 		{
-			//生成する確率を調整
-			if (GetRand(100) <= 1)
+			//生成する間隔をあける
+			if (time % 30 == 0)
 			{
-				CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::GORLD_ENEMY);
-				Enemy_count[TYPE::GORLD_ENEMY - 4] += 1;
+				//生成する確率を調整
+				if (GetRand(100) <= 1)
+				{
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[3]), TYPE::GORLD_ENEMY);
+					Enemy_count[TYPE::GORLD_ENEMY - 4] += 1;
+				}
 			}
 		}
 		//弾を生成する
@@ -276,5 +284,10 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 		//当たったことをオブジェクトに通知する
 		a->OnHitCollision(b);
 		b->OnHitCollision(a);
+
+		if (a->GetType() == TYPE::PLAYER && b->GetType() == TYPE::BULLET)
+		{
+			time -= 10;
+		}
 	}
 }

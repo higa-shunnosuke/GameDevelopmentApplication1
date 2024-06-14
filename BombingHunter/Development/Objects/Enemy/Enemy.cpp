@@ -172,10 +172,11 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//“–‚½‚Á‚½Žž‚Ìˆ—
-	//ƒ{ƒ€‚É“–‚½‚Á‚½‚ç“–‚½‚è”»’è‚ð‚È‚­‚·
+	//ƒ{ƒ€‚É“–‚½‚Á‚½‚ç
 	if (hit_object->GetType() < 2)
 	{
 		Is_hit = true;
+		//“–‚½‚è”»’è‚ð‚È‚­‚·
 		box_size = Vector2D(0.0f);
 		vector = Vector2D(1.0f,1.0f);
 	}
