@@ -4,16 +4,16 @@
 
 
 //コンストラクタ
-Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f), Is_hit(false), Is_death(false)
+Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),
+Is_hit(false), Is_death(false)
 {
 	for (int i = 0; i < 5; i++)
 	{
 		animation[i] = NULL;
 	}
 
-	player = nullptr;
 	BlendMode = 255;
-
+	flip_flag = FALSE;
 }
 
 //デストラクタ
@@ -120,10 +120,21 @@ void Enemy::Initialize(int object_type)
 //更新処理
 void Enemy::Update()
 {
+	//進行方向によって、反転状態を決定する
+	if (Is_hit != true)
+	{
+		if (vector.x > 0.0f)
+		{
+			flip_flag = FALSE;
+		}
+		else
+		{
+			flip_flag = TRUE;
+		}
+	}
+
 	//移動処理
 	Movement();
-
-	//ボムに当たるまで
 	
 	//アニメーション制御
 	AnimeControl();
@@ -132,18 +143,6 @@ void Enemy::Update()
 //描画処理
 void Enemy::Draw() const
 {
-	int flip_flag;		//画像反転フラグ
-
-	//進行方向によって、反転状態を決定する
-	if (vector.x > 0.0f)
-	{
-		flip_flag = FALSE;
-	}
-	else
-	{
-		flip_flag = TRUE;
-	}
-
 	if (Is_hit == true)
 	{
 		//描画モードをアルファブレンドにする
@@ -173,9 +172,11 @@ void Enemy::Finalize()
 void Enemy::OnHitCollision(GameObject* hit_object)
 {
 	//当たった時の処理
+	//ボムに当たったら当たり判定をなくす
 	if (hit_object->GetType() < 2)
 	{
 		Is_hit = true;
+		box_size = Vector2D(0.0f);
 		vector = Vector2D(1.0f,1.0f);
 	}
 }
@@ -191,14 +192,7 @@ bool Enemy::Delete()
 		ret = true;
 	}
 	
-
 	return ret;
-}
-
-//プレイヤーのポインタを受け取る
-void Enemy::SetPlayer(Player* player)
-{
-	this->player = player;
 }
 
 //タイプ取得処理
