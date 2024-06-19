@@ -24,7 +24,10 @@ private:
 	int time;				//タイマー
 	float LocationX[2];		//固定X座標
 	float LocationY[4];		//固定Y座標
-	int image;				//背景画像
+	int background_image;	//背景画像
+	int timer_image;		//タイマー画像
+	int highscore_image;	//ハイスコア画像
+	int score_image;		//スコア画像
 	int Enemy_count[4];		//敵の出現数
 	int Bomb_count;			//ボムの数
 

@@ -12,7 +12,11 @@ Player* p;			//プレイヤーのポインタ
 
 
 //コンストラクタ
-Scene::Scene():objects(), frame_count(0), time(60), image(NULL)
+Scene::Scene():objects(), frame_count(0), time(60),
+background_image(NULL),
+timer_image(NULL),
+score_image(NULL),
+highscore_image(NULL)
 {
 	//x座標
 	LocationX[0] = 0.0f;
@@ -43,7 +47,10 @@ Scene::~Scene()
 //初期化処理
 void Scene::Initialize()
 {
-	image = LoadGraph("Resource/Images/background.png");
+	background_image = LoadGraph("Resource/Images/background.png");
+	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
+	score_image = LoadGraph("Resource/Images/Score/score.png");
+	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
 
 	//プレイヤーを生成する
 	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),TYPE::PLAYER);
@@ -232,7 +239,13 @@ void Scene::Update()
 void Scene::Draw() const
 {
 	//背景画像の描画
-	DrawRotaGraphF(320.0f, 240.0f, 0.7, 0, image, TRUE, 0);
+	DrawRotaGraphF(320.0f, 240.0f, 0.7, 0, background_image, TRUE, 0);
+	//タイマー画像の描画
+	DrawRotaGraphF(20.0f, 465.0f, 0.5, 0, timer_image, TRUE, 0);
+	//スコア画像の描画
+	DrawRotaGraphF(150.0f, 465.0f, 1.0, 0, score_image, TRUE, 0);
+	//ハイスコア画像の描画
+	DrawRotaGraphF(350.0f, 465.0f, 1.0, 0, highscore_image, TRUE, 0);
 
 	//シーンに存在するオブジェクトの描画処理
 	for (GameObject* obj:objects)
@@ -285,9 +298,15 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 		a->OnHitCollision(b);
 		b->OnHitCollision(a);
 
+		//プレイヤーが弾に当たると制限時間を減らす
 		if (a->GetType() == TYPE::PLAYER && b->GetType() == TYPE::BULLET)
 		{
-			time -= 10;
+			time -= 1;
+		}
+		//プレイヤーが弾に当たると制限時間を減らす
+		if (a->GetType() == TYPE::PLAYER && b->GetType() == TYPE::BULLET)
+		{
+			time -= 1;
 		}
 	}
 }
