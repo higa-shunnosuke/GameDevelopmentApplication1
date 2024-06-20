@@ -312,7 +312,7 @@ void Scene::Finalize()
 		else
 		{
 			//ハイスコアを読み込む
-			fputs(itoa(score,highscore,10), fp);
+			fprintf(fp,"%d",score);
 
 			//ファイルを閉じる
 			fclose(fp);
