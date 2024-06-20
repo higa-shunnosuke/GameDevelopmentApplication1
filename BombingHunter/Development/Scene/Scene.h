@@ -24,12 +24,15 @@ private:
 	int time;				//タイマー
 	float LocationX[2];		//固定X座標
 	float LocationY[4];		//固定Y座標
+	int Enemy_count[4];		//敵の出現数
+	int Bomb_count;			//ボムの数
 	int background_image;	//背景画像
 	int timer_image;		//タイマー画像
 	int highscore_image;	//ハイスコア画像
 	int score_image;		//スコア画像
-	int Enemy_count[4];		//敵の出現数
-	int Bomb_count;			//ボムの数
+	int score;				//スコア
+	char highscore[128];	//ハイスコア
+	bool Is_pause;			//ポーズフラグ
 
 
 public:
@@ -44,6 +47,9 @@ public:
 private:
 	//当たり判定チェック処理
 	void HitCheckObject(GameObject* a, GameObject* b);
+
+	//スコア描画処理
+	void ScoreDraw() const;
 
 	//オブジェクト生成処理
 	template <class T>

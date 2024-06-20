@@ -7,9 +7,9 @@
 #include "../Utility/InputControl.h"
 #include "DxLib.h"
 
-bool Is_pause;		//ポーズフラグ
-Player* p;			//プレイヤーのポインタ
+#define SCORE_DATA ("Resource/dats/highscore.csv")
 
+Player* p;				//プレイヤーのポインタ
 
 //コンストラクタ
 Scene::Scene():objects(), frame_count(0), time(60),
@@ -35,6 +35,16 @@ highscore_image(NULL)
 
 	//ボムの数のカウントを初期化
 	Bomb_count = 0;
+
+	//スコアの初期化
+	score = 200;
+	for (int i = 0; i < 128; i++)
+	{
+		highscore[i] = 0;
+	}
+
+	//ポーズフラグの初期化
+	Is_pause = false;
 }
 
 //デストラクタ
@@ -51,6 +61,26 @@ void Scene::Initialize()
 	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
 	score_image = LoadGraph("Resource/Images/Score/score.png");
 	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
+
+	//ファイルパス
+	FILE* fp = NULL;
+
+	//読込みファイルを開く
+	fopen_s(&fp, SCORE_DATA, "r");
+
+	//エラーチェック
+	if (fp == NULL)
+	{
+		throw("ファイルが読み込めません\n");
+	}
+	else
+	{
+		//ハイスコアを読み込む
+		fgets(highscore,128,fp);
+
+		//ファイルを閉じる
+		fclose(fp);
+	}
 
 	//プレイヤーを生成する
 	p = CreateObject<Player>(Vector2D(320.0f, 50.0f),TYPE::PLAYER);
@@ -247,24 +277,48 @@ void Scene::Draw() const
 	//ハイスコア画像の描画
 	DrawRotaGraphF(350.0f, 465.0f, 1.0, 0, highscore_image, TRUE, 0);
 
+	ScoreDraw();
+
 	//シーンに存在するオブジェクトの描画処理
 	for (GameObject* obj:objects)
 	{
 		obj->Draw();
 	}
 
-	for (int i = 0; i < 4; i++)
-	{
-		DrawFormatString(10, 10 + i * 20, 0x00, "カウント%d：%d",i, Enemy_count[i]);
-	}
-	DrawFormatString(10, 90, 0x00, "フレーム：%d", frame_count);
-	DrawFormatString(10, 110, 0x00, "時間：%d", time);
+	DrawFormatString(10, 10, 0x00, "フレーム：%d", frame_count);
+	DrawFormatString(10, 30, 0x00, "時間：%d", time);
+	DrawFormatString(10, 50, 0x00, "score：%d", score);
+	DrawFormatString(10, 70, 0x00, "highscore：%s", highscore);
 
 }
 
 //終了時処理
 void Scene::Finalize()
 {
+	//ファイルパス
+	FILE* fp = NULL;
+
+	if (score > atoi(highscore))
+	{
+
+		//読込みファイルを開く
+		fopen_s(&fp, SCORE_DATA, "w");
+
+		//エラーチェック
+		if (fp == NULL)
+		{
+			throw("ファイルが読み込めません\n");
+		}
+		else
+		{
+			//ハイスコアを読み込む
+			fputs(itoa(score,highscore,10), fp);
+
+			//ファイルを閉じる
+			fclose(fp);
+		}
+	}
+
 	//動的配列が空なら処理を終了する
 	if (objects.empty())
 	{
@@ -303,10 +357,32 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 		{
 			time -= 1;
 		}
-		//プレイヤーが弾に当たると制限時間を減らす
-		if (a->GetType() == TYPE::PLAYER && b->GetType() == TYPE::BULLET)
+		//ハーピーがボムに当たるとスコアを減らす
+		if (a->GetType() == TYPE::HARPY && b->GetType() == TYPE::BOMB)
 		{
-			time -= 1;
+			score -= 1;
 		}
+		//ハネテキがボムに当たるとスコアを増やす
+		if (a->GetType() == TYPE::FLY_ENEMY && b->GetType() == TYPE::BOMB)
+		{
+			score += 1;
+		}
+		//ハコテキがボムに当たるとスコアを増やす
+		if (a->GetType() == TYPE::BOX_ENEMY && b->GetType() == TYPE::BOMB)
+		{
+			score += 10;
+		}
+		//金のテキがボムに当たるとスコアを増やす
+		if (a->GetType() == TYPE::GORLD_ENEMY && b->GetType() == TYPE::BOMB)
+		{
+			score += 100;
+		}
+		
 	}
+}
+
+//スコア描画処理
+void Scene::ScoreDraw() const
+{
+
 }
