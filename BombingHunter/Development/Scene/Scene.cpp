@@ -10,6 +10,7 @@
 #define SCORE_DATA ("Resource/dats/highscore.csv")
 
 Player* p;				//プレイヤーのポインタ
+int image;
 
 //コンストラクタ
 Scene::Scene():objects(), frame_count(0), time(60),
@@ -31,6 +32,12 @@ highscore_image(NULL)
 	for (int i = 0; i < 4; i++)
 	{
 		Enemy_count[i] = 0;
+	}
+
+	//数字画像の初期化
+	for (int i = 0; i < 10; i++)
+	{
+		number[i] = NULL;
 	}
 
 	//ボムの数のカウントを初期化
@@ -58,6 +65,7 @@ void Scene::Initialize()
 	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
 	score_image = LoadGraph("Resource/Images/Score/score.png");
 	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
+	LoadDivGraph("Resource/images/Enemy/troll/troll_all.png", 10, 5, 2, 160, 214, number);
 
 	//ファイルパス
 	FILE* fp = NULL;
@@ -96,6 +104,8 @@ void Scene::Initialize()
 
 	//制限時間の初期化
 	time = 60;
+
+	image = number[0];
 }
 
 //更新処理
@@ -380,5 +390,6 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 //スコア描画処理
 void Scene::ScoreDraw() const
 {
-
+	//DrawRotaGraphF(185.0f, 465.0f, 1.0, 0, number, TRUE);
+	DrawRotaGraphF(395.0f, 465.0f, 0.2, 0, number[0], TRUE);
 }
