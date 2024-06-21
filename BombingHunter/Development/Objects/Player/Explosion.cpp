@@ -91,12 +91,6 @@ bool Explosion::Delete()
 	return ret;
 }
 
-//タイプ取得処理
-int Explosion::GetType()
-{
-	return this->type;
-}
-
 //アニメーション制御
 void Explosion::AnimeControl()
 {

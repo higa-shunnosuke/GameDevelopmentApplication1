@@ -30,8 +30,9 @@ private:
 	int timer_image;		//タイマー画像
 	int highscore_image;	//ハイスコア画像
 	int score_image;		//スコア画像
+	int Num[11];			//数字画像
 	int score;				//スコア
-	char highscore[128];	//ハイスコア
+	int highscore;			//ハイスコア
 	bool Is_pause;			//ポーズフラグ
 
 

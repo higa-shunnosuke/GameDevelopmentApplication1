@@ -92,12 +92,6 @@ bool Bomb::Delete()
 	return ret;
 }
 
-//タイプ取得処理
-int Bomb::GetType()
-{
-	return this->type;
-}
-
 //プレイヤーのポインタを受け取る、ついでに進行方向を設定する
 void Bomb::SetPlayer(Player* player)
 {

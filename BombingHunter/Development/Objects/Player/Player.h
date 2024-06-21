@@ -23,12 +23,8 @@ public:
 	//当たり判定通知処理
 	virtual void OnHitCollision(GameObject* hit_object) override;
 
-	//位置情報取得処理
-	Vector2D GetLocation() const;
 	//向き取得処理
 	int GetDirection() const;
-	//タイプ取得処理
-	virtual int GetType() override;
 
 private:
 	//移動処理

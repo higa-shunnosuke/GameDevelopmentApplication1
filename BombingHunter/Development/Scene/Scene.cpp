@@ -37,11 +37,8 @@ highscore_image(NULL)
 	Bomb_count = 0;
 
 	//スコアの初期化
-	score = 200;
-	for (int i = 0; i < 128; i++)
-	{
-		highscore[i] = 0;
-	}
+	score = 0;
+	highscore = 0;
 
 	//ポーズフラグの初期化
 	Is_pause = false;
@@ -76,7 +73,7 @@ void Scene::Initialize()
 	else
 	{
 		//ハイスコアを読み込む
-		fgets(highscore,128,fp);
+		fscanf_s(fp,"%d",&highscore);
 
 		//ファイルを閉じる
 		fclose(fp);
@@ -288,8 +285,7 @@ void Scene::Draw() const
 	DrawFormatString(10, 10, 0x00, "フレーム：%d", frame_count);
 	DrawFormatString(10, 30, 0x00, "時間：%d", time);
 	DrawFormatString(10, 50, 0x00, "score：%d", score);
-	DrawFormatString(10, 70, 0x00, "highscore：%s", highscore);
-
+	DrawFormatString(10, 70, 0x00, "highscore：%d", highscore);
 }
 
 //終了時処理
@@ -298,7 +294,7 @@ void Scene::Finalize()
 	//ファイルパス
 	FILE* fp = NULL;
 
-	if (score > atoi(highscore))
+	if (score > highscore)
 	{
 
 		//読込みファイルを開く

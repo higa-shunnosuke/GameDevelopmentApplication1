@@ -12,7 +12,9 @@ Player::Player():frame_count(0),flip_flag(FALSE),direction(0)
 
 //デストラクタ
 Player::~Player()
-{}
+{
+
+}
 
 //初期化処理
 void Player::Initialize(int object_type)
@@ -74,21 +76,9 @@ void Player::OnHitCollision(GameObject* hit_object)
 }
 
 //位置情報取得処理
-Vector2D Player::GetLocation() const
-{
-	return this->location;
-}
-
-//位置情報取得処理
 int Player::GetDirection() const
 {
 	return this->direction;
-}
-
-//タイプ取得処理
-int Player::GetType()
-{
-	return this->type;
 }
 
 //移動処理

@@ -23,8 +23,6 @@ public:
 
 	//削除判定通知処理
 	virtual bool Delete() override;
-	//タイプ取得処理
-	virtual int GetType() override;
 
 private:
 	//アニメーション制御

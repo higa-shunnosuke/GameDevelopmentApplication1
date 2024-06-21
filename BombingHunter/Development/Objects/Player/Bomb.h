@@ -31,8 +31,6 @@ public:
 	virtual bool Delete() override;
 	//プレイヤーのポインタを受け取る
 	virtual void SetPlayer(class Player* player);
-	//タイプ取得処理
-	virtual int GetType() override;
 
 private:
 	//移動処理
