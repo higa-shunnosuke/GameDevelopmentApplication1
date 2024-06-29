@@ -30,6 +30,7 @@ private:
 	int timer_image;		//タイマー画像
 	int highscore_image;	//ハイスコア画像
 	int score_image;		//スコア画像
+	int minus_image;		//マイナス画像
 	int number[11];			//数字画像
 	int score;				//スコア
 	int highscore;			//ハイスコア

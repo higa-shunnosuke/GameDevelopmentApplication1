@@ -17,6 +17,7 @@ Scene::Scene():objects(), frame_count(0), time(60),
 background_image(NULL),
 timer_image(NULL),
 score_image(NULL),
+minus_image(NULL),
 highscore_image(NULL)
 {
 	//x座標
@@ -65,6 +66,7 @@ void Scene::Initialize()
 	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
 	score_image = LoadGraph("Resource/Images/Score/score.png");
 	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
+	minus_image = LoadGraph("Resource/Images/Score/-.png");
 	LoadDivGraph("Resource/images/Score/numbers.png", 10, 5, 2, 160, 214, number);
 
 	//ファイルパス
@@ -150,21 +152,21 @@ void Scene::Update()
 		//それぞれのエネミーを出現数の上限まで生成する
 		//ハーピーを生成する
 		//生成を１秒待ってハーピーが重ならないようにする
-		//if (Enemy_count[0] < 2)
-		//{
-		//	//生成する間隔をあける
-		//	if (frame_count == 0)
-		//	{
-		//		//生成する確率を調整
-		//		if (GetRand(100) <= 40)
-		//		{
-		//			CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
-		//			Enemy_count[TYPE::HARPY - 4] += 1;
-		//		}
-		//	}
-		//}
+		if (Enemy_count[0] < 2)
+		{
+			//生成する間隔をあける
+			if (frame_count == 0)
+			{
+				//生成する確率を調整
+				if (GetRand(100) <= 40)
+				{
+					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
+					Enemy_count[TYPE::HARPY - 4] += 1;
+				}
+			}
+		}
 		//ハネテキを生成する
-		if (Enemy_count[1] < 2)
+		if (Enemy_count[1] < 5)
 		{
 			//生成する間隔をあける
 			if (frame_count == 0)
@@ -178,7 +180,7 @@ void Scene::Update()
 			}
 		}
 		//ハコテキを生成する
-		if (Enemy_count[2] < 2)
+		if (Enemy_count[2] < 1)
 		{
 			//生成する間隔をあける
 			if (frame_count == 0)
@@ -289,11 +291,6 @@ void Scene::Draw() const
 	DrawFormatString(10, 50, 0x00, "score：%d", score);
 	DrawFormatString(10, 70, 0x00, "highscore：%d", highscore);
 
-	//DrawRotaGraphF(184.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
-	//DrawRotaGraphF(200.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
-	//DrawRotaGraphF(405.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
-	//DrawRotaGraphF(412.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
-
 	//スコア画像の描画
 	DrawRotaGraphF(150.0f, 465.0f, 1.1, 0, score_image, TRUE, 0);
 	//ハイスコア画像の描画
@@ -301,8 +298,8 @@ void Scene::Draw() const
 	//タイマー画像の描画
 	DrawRotaGraphF(20.0f, 465.0f, 0.5, 0, timer_image, TRUE, 0);
 
-
 	UIDraw();
+
 }
 
 //終了時処理
@@ -390,7 +387,6 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 		{
 			score += 100;
 		}
-		
 	}
 }
 
@@ -398,12 +394,26 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 void Scene::UIDraw() const
 {
 	//スコアから計算
-	int s1 = score;		//スコア
+	int s1;			//スコア
+	int i;			//カウント用の変数
+
+	//スコアがマイナスだったとき
+	if (score < 0)
+	{
+		s1 = -score;
+		i = 1;
+	}
+	else
+	{
+		s1 = score;
+		i = 0;
+	}
+
 	int s2 = s1;		//上１桁を省いた値
 	int s3 = 0;			//上一桁の位の値
 	int digit = 0;		//桁の数
 	int num;			//番号
-	int i = 0;			//カウント用の変数
+	
 
 	//スコアの桁数を確認
 	while (s2 / 10 > 0)
@@ -426,6 +436,12 @@ void Scene::UIDraw() const
 
 		//上一桁の数
 		num = s3 / (int)pow(10, digit);
+
+		//マイナスを描画
+		if (score < 0)
+		{
+			DrawRotaGraphF(185.0f, 465.0f, 1.0, 0, minus_image, TRUE, 0);
+		}
 
 		//上一桁の数を描画
 		DrawRotaGraphF(185.0f + (i * 16.0f), 465.0f, 0.1, 0, number[num], TRUE, 0);

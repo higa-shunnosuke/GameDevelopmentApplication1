@@ -12,6 +12,14 @@ Is_hit(false), Is_death(false)
 		animation[i] = NULL;
 	}
 
+	minus_image = NULL;
+
+	//数字画像の初期化
+	for (int i = 0; i < 11; i++)
+	{
+		number[i] = NULL;
+	}
+
 	BlendMode = 255;
 	flip_flag = FALSE;
 }
@@ -25,6 +33,9 @@ Enemy::~Enemy()
 //初期化処理
 void Enemy::Initialize(int object_type)
 {
+	minus_image = LoadGraph("Resource/Images/Score/-.png");
+	LoadDivGraph("Resource/images/Score/numbers.png", 10, 5, 2, 160, 214, number);
+
 	switch (object_type)
 	{
 	case 4:
@@ -154,6 +165,35 @@ void Enemy::Draw() const
 
 	//描画モードをノーブレンドにする
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	if (Is_hit == true)
+	{
+		switch (type)
+		{
+		case 4:
+			DrawRotaGraphF(location.x + 40, location.y - 30, 1.0, 0, minus_image, TRUE, 0);
+			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[1], TRUE, 0);
+			
+			break;
+		case 5:
+			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
+
+			break;
+		case 6:
+			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
+			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[0], TRUE, 0);
+
+			break;
+		case 7:
+			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
+			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[0], TRUE, 0);
+			DrawRotaGraphF(location.x + 72, location.y - 30, 0.1, 0, number[0], TRUE, 0);
+
+			break;
+		default:
+			break;
+		}
+	}
 
 	__super::Draw();
 }

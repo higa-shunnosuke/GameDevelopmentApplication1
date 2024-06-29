@@ -16,6 +16,8 @@ private:
 	bool Is_hit;			//ボムに当たったか
 	bool Is_death;			//死んだか
 	int BlendMode;			//ブレンド値
+	int number[11];			//数字画像
+	int minus_image;		//マイナス画像
 	
 public:
 	Enemy();
