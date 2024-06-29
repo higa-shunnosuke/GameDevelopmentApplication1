@@ -117,15 +117,17 @@ bool Bullet::Delete()
 //プレイヤーのポインタを受け取る、ついでに進行方向を設定する
 void Bullet::SetPlayer(Player* player)
 {
-	this->player = player;
-
-	//プレイヤーとの距離を取得
-	Vector2D deff = player->GetLocation() - location;
+	if (this->player == nullptr)
+	{
+		this->player = player;
 	
-	//プレイヤーまでの角度を算出
-	radian = atan2f(deff.y, deff.x);
-	vector = Vector2D(2.f*cosf(radian), 2.f*sinf(radian));
+		//プレイヤーとの距離を取得
+		Vector2D deff = player->GetLocation() - location;
 
+		//プレイヤーまでの角度を算出
+		radian = atan2f(deff.y, deff.x);
+		vector = Vector2D(2.f * cosf(radian), 2.f * sinf(radian));
+	}
 }
 
 //タイプ取得処理

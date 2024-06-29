@@ -35,7 +35,7 @@ highscore_image(NULL)
 	}
 
 	//数字画像の初期化
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		number[i] = NULL;
 	}
@@ -65,7 +65,7 @@ void Scene::Initialize()
 	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
 	score_image = LoadGraph("Resource/Images/Score/score.png");
 	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
-	LoadDivGraph("Resource/images/Enemy/troll/troll_all.png", 10, 5, 2, 160, 214, number);
+	LoadDivGraph("Resource/images/Score/numbers.png", 10, 5, 2, 160, 214, number);
 
 	//ファイルパス
 	FILE* fp = NULL;
@@ -150,21 +150,21 @@ void Scene::Update()
 		//それぞれのエネミーを出現数の上限まで生成する
 		//ハーピーを生成する
 		//生成を１秒待ってハーピーが重ならないようにする
-		if (Enemy_count[0] < 2)
-		{
-			//生成する間隔をあける
-			if (frame_count == 0)
-			{
-				//生成する確率を調整
-				if (GetRand(100) <= 40)
-				{
-					CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
-					Enemy_count[TYPE::HARPY - 4] += 1;
-				}
-			}
-		}
+		//if (Enemy_count[0] < 2)
+		//{
+		//	//生成する間隔をあける
+		//	if (frame_count == 0)
+		//	{
+		//		//生成する確率を調整
+		//		if (GetRand(100) <= 40)
+		//		{
+		//			CreateObject<Enemy>(Vector2D(LocationX[GetRand(1)], LocationY[GetRand(1) + 1]), TYPE::HARPY);
+		//			Enemy_count[TYPE::HARPY - 4] += 1;
+		//		}
+		//	}
+		//}
 		//ハネテキを生成する
-		if (Enemy_count[1] < 5)
+		if (Enemy_count[1] < 2)
 		{
 			//生成する間隔をあける
 			if (frame_count == 0)
@@ -178,7 +178,7 @@ void Scene::Update()
 			}
 		}
 		//ハコテキを生成する
-		if (Enemy_count[2] < 1)
+		if (Enemy_count[2] < 2)
 		{
 			//生成する間隔をあける
 			if (frame_count == 0)
@@ -277,14 +277,6 @@ void Scene::Draw() const
 {
 	//背景画像の描画
 	DrawRotaGraphF(320.0f, 240.0f, 0.7, 0, background_image, TRUE, 0);
-	//タイマー画像の描画
-	DrawRotaGraphF(20.0f, 465.0f, 0.5, 0, timer_image, TRUE, 0);
-	//スコア画像の描画
-	DrawRotaGraphF(150.0f, 465.0f, 1.0, 0, score_image, TRUE, 0);
-	//ハイスコア画像の描画
-	DrawRotaGraphF(350.0f, 465.0f, 1.0, 0, highscore_image, TRUE, 0);
-
-	ScoreDraw();
 
 	//シーンに存在するオブジェクトの描画処理
 	for (GameObject* obj:objects)
@@ -296,6 +288,21 @@ void Scene::Draw() const
 	DrawFormatString(10, 30, 0x00, "時間：%d", time);
 	DrawFormatString(10, 50, 0x00, "score：%d", score);
 	DrawFormatString(10, 70, 0x00, "highscore：%d", highscore);
+
+	//DrawRotaGraphF(184.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
+	//DrawRotaGraphF(200.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
+	//DrawRotaGraphF(405.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
+	//DrawRotaGraphF(412.0f, 465.0f, 0.1, 0, number[0], TRUE, 0);
+
+	//スコア画像の描画
+	DrawRotaGraphF(150.0f, 465.0f, 1.1, 0, score_image, TRUE, 0);
+	//ハイスコア画像の描画
+	DrawRotaGraphF(350.0f, 465.0f, 1.2, 0, highscore_image, TRUE, 0);
+	//タイマー画像の描画
+	DrawRotaGraphF(20.0f, 465.0f, 0.5, 0, timer_image, TRUE, 0);
+
+
+	UIDraw();
 }
 
 //終了時処理
@@ -387,9 +394,113 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 	}
 }
 
-//スコア描画処理
-void Scene::ScoreDraw() const
+//UI描画処理
+void Scene::UIDraw() const
 {
-	//DrawRotaGraphF(185.0f, 465.0f, 1.0, 0, number, TRUE);
-	DrawRotaGraphF(395.0f, 465.0f, 0.2, 0, number[0], TRUE);
+	//スコアから計算
+	int s1 = score;		//スコア
+	int s2 = s1;		//上１桁を省いた値
+	int s3 = 0;			//上一桁の位の値
+	int digit = 0;		//桁の数
+	int num;			//番号
+	int i = 0;			//カウント用の変数
+
+	//スコアの桁数を確認
+	while (s2 / 10 > 0)
+	{
+		digit++;
+		s2 = s2 / 10;		//小さい位から順に省いていく
+	}
+
+	DrawFormatString(10, 90, 0x00, "digit：%d", digit);
+
+
+	//スコアを描画
+	while (digit > -1)
+	{
+		//上１桁を省いた値
+		s2 = s1 % (int)pow(10, digit);
+
+		//上一桁の位の値
+		s3 = s1 - s2;
+
+		//上一桁の数
+		num = s3 / (int)pow(10, digit);
+
+		//上一桁の数を描画
+		DrawRotaGraphF(185.0f + (i * 16.0f), 465.0f, 0.1, 0, number[num], TRUE, 0);
+		
+		//位をずらす
+		digit--;
+		s1 = s2;
+		i++;
+	}
+	
+	//ハイスコアを計算
+	s1 = highscore;
+	s2 = s1;
+	digit = 0;
+	i = 0;
+
+	//ハイスコアの桁数を確認
+	while (s2 / 10 > 0)
+	{
+		digit++;
+		s2 = s2 / 10;		//小さい位から順に省いていく
+	}
+
+	//ハイスコアを描画
+	while (digit > -1)
+	{
+		//上１桁を省いた値
+		s2 = s1 % (int)pow(10, digit);
+
+		//上一桁の位の値
+		s3 = s1 - s2;
+
+		//上一桁の数
+		num = s3 / (int)pow(10, digit);
+
+		//上一桁の数を描画
+		DrawRotaGraphF(405.0f + (i * 16.0f), 465.0f, 0.1, 0, number[num], TRUE, 0);
+		
+		//位をずらす
+		digit--;
+		s1 = s2;
+		i++;
+	}
+
+	//タイムを計算
+	s1 = time;
+	s2 = s1;
+	digit = 0;
+	i = 0;
+
+	//タイムの桁数を確認
+	while (s2 / 10 > 0)
+	{
+		digit++;
+		s2 = s2 / 10;		//小さい位から順に省いていく
+	}
+
+	//タイムを描画
+	while (digit > -1)
+	{
+		//上１桁を省いた値
+		s2 = s1 % (int)pow(10, digit);
+
+		//上一桁の位の値
+		s3 = s1 - s2;
+
+		//上一桁の数
+		num = s3 / (int)pow(10, digit);
+
+		//上一桁の数を描画
+		DrawRotaGraphF(45.0f + (i * 16.0f), 465.0f, 0.1, 0, number[num], TRUE, 0);
+
+		//位をずらす
+		digit--;
+		s1 = s2;
+		i++;
+	}
 }

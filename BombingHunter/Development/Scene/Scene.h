@@ -30,7 +30,7 @@ private:
 	int timer_image;		//タイマー画像
 	int highscore_image;	//ハイスコア画像
 	int score_image;		//スコア画像
-	int number[10];			//数字画像
+	int number[11];			//数字画像
 	int score;				//スコア
 	int highscore;			//ハイスコア
 	bool Is_pause;			//ポーズフラグ
@@ -50,7 +50,7 @@ private:
 	void HitCheckObject(GameObject* a, GameObject* b);
 
 	//スコア描画処理
-	void ScoreDraw() const;
+	void UIDraw() const;
 
 	//オブジェクト生成処理
 	template <class T>
