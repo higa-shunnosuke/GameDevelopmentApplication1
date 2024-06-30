@@ -182,22 +182,23 @@ void Enemy::Draw() const
 		case 4:
 			DrawRotaGraphF(location.x + 40, location.y - 30, 1.0, 0, minus_image, TRUE, 0);
 			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[1], TRUE, 0);
-			
+			DrawRotaGraphF(location.x + 72, location.y - 30, 0.1, 0, number[0], TRUE, 0);
+			DrawRotaGraphF(location.x + 88, location.y - 30, 0.1, 0, number[0], TRUE, 0);
 			break;
 		case 5:
-			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
-
+			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[3], TRUE, 0);
+			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[0], TRUE, 0);
 			break;
 		case 6:
-			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
+			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[2], TRUE, 0);
 			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[0], TRUE, 0);
-
+			DrawRotaGraphF(location.x + 72, location.y - 30, 0.1, 0, number[0], TRUE, 0);
 			break;
 		case 7:
 			DrawRotaGraphF(location.x + 40, location.y - 30, 0.1, 0, number[1], TRUE, 0);
-			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[0], TRUE, 0);
+			DrawRotaGraphF(location.x + 56, location.y - 30, 0.1, 0, number[5], TRUE, 0);
 			DrawRotaGraphF(location.x + 72, location.y - 30, 0.1, 0, number[0], TRUE, 0);
-
+			DrawRotaGraphF(location.x + 88, location.y - 30, 0.1, 0, number[0], TRUE, 0);
 			break;
 		default:
 			break;
