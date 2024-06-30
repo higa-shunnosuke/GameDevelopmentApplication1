@@ -5,7 +5,10 @@
 
 //コンストラクタ
 Enemy::Enemy() :frame_count(0),animation_max(0), count(0), vector(0.0),speed(0.0f),
-Is_hit(false), Is_death(false)
+Is_hit(false), Is_death(false),
+harpy_SE(NULL),
+enemy_SE(NULL),
+gold_SE(NULL)
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -33,8 +36,14 @@ Enemy::~Enemy()
 //初期化処理
 void Enemy::Initialize(int object_type)
 {
+	//画像の読込み
 	minus_image = LoadGraph("Resource/Images/Score/-.png");
 	LoadDivGraph("Resource/images/Score/numbers.png", 10, 5, 2, 160, 214, number);
+
+	//音源の読み込み
+	harpy_SE = LoadSoundMem("Resource/sounds/pokan.wav");
+	enemy_SE = LoadSoundMem("Resource/sounds/teki_gahee.wav");
+	gold_SE = LoadSoundMem("Resource/sounds/arrows_perfect03_short.wav");
 
 	switch (object_type)
 	{
@@ -215,6 +224,18 @@ void Enemy::OnHitCollision(GameObject* hit_object)
 	//ボムに当たったら
 	if (hit_object->GetType() < 2)
 	{
+		if (type == TYPE::HARPY)
+		{
+			PlaySoundMem(harpy_SE, DX_PLAYTYPE_BACK);
+		}
+		else if (type == TYPE::FLY_ENEMY || type == TYPE::BOX_ENEMY)
+		{
+			PlaySoundMem(enemy_SE, DX_PLAYTYPE_BACK);
+		}
+		else if (type == TYPE::GORLD_ENEMY)
+		{
+			PlaySoundMem(gold_SE, DX_PLAYTYPE_BACK);
+		}
 		Is_hit = true;
 		//当たり判定をなくす
 		box_size = Vector2D(0.0f);

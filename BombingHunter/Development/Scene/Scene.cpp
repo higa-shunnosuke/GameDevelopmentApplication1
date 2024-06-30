@@ -3,6 +3,7 @@
 #include "../Objects/Player/Bomb.h"
 #include "../Objects/Player/Explosion.h"
 #include "../Objects/Enemy/Enemy.h"
+#include "../Objects/Enemy/Evaluation.h"
 #include "../Objects/Enemy/Bullet.h"
 #include "../Utility/InputControl.h"
 #include "DxLib.h"
@@ -13,12 +14,18 @@ Player* p;				//プレイヤーのポインタ
 int image;
 
 //コンストラクタ
-Scene::Scene():objects(), frame_count(0), time(60),
+Scene::Scene():objects(), frame_count(0), time(0),
 background_image(NULL),
+background_sound(NULL),
 timer_image(NULL),
 score_image(NULL),
 minus_image(NULL),
-highscore_image(NULL)
+highscore_image(NULL),
+throw_SE(NULL),
+explosion_SE(NULL),
+timeup_SE(NULL),
+timeup(false)
+
 {
 	//x座標
 	LocationX[0] = 0.0f;
@@ -62,12 +69,19 @@ Scene::~Scene()
 //初期化処理
 void Scene::Initialize()
 {
+	//画像の読込み
 	background_image = LoadGraph("Resource/Images/background.png");
 	timer_image = LoadGraph("Resource/Images/Evaluation/timer.png");
 	score_image = LoadGraph("Resource/Images/Score/score.png");
 	highscore_image = LoadGraph("Resource/Images/Score/highscore.png");
 	minus_image = LoadGraph("Resource/Images/Score/-.png");
 	LoadDivGraph("Resource/images/Score/numbers.png", 10, 5, 2, 160, 214, number);
+
+	//音源の読み込み
+	background_sound = LoadSoundMem("Resource/sounds/BGM_arrows.wav");
+	throw_SE = LoadSoundMem("Resource/sounds/pan.wav");
+	explosion_SE = LoadSoundMem("Resource/sounds/explosion.wav");
+	timeup_SE = LoadSoundMem("Resource/sounds/BGM_timeup.wav");
 
 	//ファイルパス
 	FILE* fp = NULL;
@@ -108,47 +122,114 @@ void Scene::Initialize()
 	time = 60;
 
 	image = number[0];
+
+	PlaySoundMem(background_sound, DX_PLAYTYPE_LOOP);
+
 }
 
 //更新処理
 void Scene::Update()
 {
-	//ポーズ状態のとき
-	if (Is_pause == true)
-	{
-		//Zキーを押すとポーズを解除する
-		if (InputControl::GetKeyDown(KEY_INPUT_Z))
-		{
-			Is_pause = false;
-		}
-		
-		//Aキーを押すとリスタートする
-		if (InputControl::GetKeyDown(KEY_INPUT_A))
-		{
-			Finalize();
-			Initialize();
-		}
-	}
-	//ポーズ状態じゃないのとき
-	else
-	{
-		//Zキーを押すとポーズにする
-		if (InputControl::GetKeyDown(KEY_INPUT_Z))
-		{
-			Is_pause = true;
-		}
+	//フレームカウントを加算する
+	frame_count++;
 
-		//フレームカウントを加算する
-		frame_count++;
-
-		//６０フレーム目に到達したら
-		if (frame_count == 60)
+	//６０フレーム目に到達したら
+	if (frame_count == 60)
+	{
+		//カウントのリセット
+		if (time > 0)
 		{
-			//カウントのリセット
 			time--;
 			frame_count = 0;
 		}
+		
+	}
 
+	//制限時間になったら
+	if (time <= 0)
+	{		
+		if (timeup == false)
+		{
+			StopSoundMem(background_sound);
+			//DeleteSoundMem(background_sound);
+			PlaySoundMem(timeup_SE, DX_PLAYTYPE_BACK);
+			Finalize();
+			frame_count = 0;
+
+			p = CreateObject<Player>(Vector2D(320.0f, 50.0f), TYPE::PLAYER);
+
+			timeup = true;
+		}
+
+		if (frame_count == 180)
+		{
+			if (score >= 3000)
+			{
+				CreateObject<Evaluation>(Vector2D(320.0f, 240.0f), TYPE::PERFECT);
+			}
+			else if (score >= 1500)
+			{
+				CreateObject<Evaluation>(Vector2D(320.0f, 240.0f), TYPE::GOOD);
+			}
+			else if (score >= 1000)
+			{
+				CreateObject<Evaluation>(Vector2D(320.0f, 240.0f), TYPE::OK);
+			}
+			else
+			{
+				CreateObject<Evaluation>(Vector2D(320.0f, 240.0f), TYPE::BAD);
+			}
+		}
+		
+		//スペースキーが押されたら、ボムを生成する
+		if (InputControl::GetKeyDown(KEY_INPUT_SPACE))
+		{
+			if (Bomb_count < 1)
+			{
+				CreateObject<Bomb>(objects[0]->GetLocation(), TYPE::BOMB)->SetPlayer(p);
+				Bomb_count++;
+				PlaySoundMem(throw_SE, DX_PLAYTYPE_BACK);
+			}
+		}
+
+		//シーンに存在するオブジェクトの更新処理
+		for (GameObject* obj : objects)
+		{
+			obj->Update();
+		}
+
+		//オブジェクト同士の当たり判定チェック
+		for (int i = 0; i < objects.size(); i++)
+		{
+			for (int j = i + 1; j < objects.size(); j++)
+			{
+				//当たり判定チェック処理
+				HitCheckObject(objects[i], objects[j]);
+			}
+		}
+
+		//オブジェクトの削除判定チェック
+		for (int i = 0; i < objects.size(); i++)
+		{
+			//削除判定チェック処理
+			if (objects[i]->Delete() == true)
+			{
+				if (objects[i]->GetType() == 1)
+				{
+					Bomb_count--;
+
+					//爆破エフェクトの生成
+					CreateObject<Explosion>(objects[i]->GetLocation(), TYPE::EXPLOSION);
+					PlaySoundMem(explosion_SE, DX_PLAYTYPE_BACK);
+				}
+				//オブジェクトの削除
+				objects.erase(objects.begin() + i);
+			}
+		}
+	}
+	//制限時間が０じゃないのとき
+	else
+	{
 		//それぞれのエネミーを出現数の上限まで生成する
 		//ハーピーを生成する
 		//生成を１秒待ってハーピーが重ならないようにする
@@ -231,6 +312,7 @@ void Scene::Update()
 			{
 				CreateObject<Bomb>(objects[0]->GetLocation(), TYPE::BOMB)->SetPlayer(p);
 				Bomb_count++;
+				PlaySoundMem(throw_SE, DX_PLAYTYPE_BACK);
 			}
 		}
 
@@ -266,6 +348,7 @@ void Scene::Update()
 
 					//爆破エフェクトの生成
 					CreateObject<Explosion>(objects[i]->GetLocation(), TYPE::EXPLOSION);
+					PlaySoundMem(explosion_SE, DX_PLAYTYPE_BACK);
 				}
 				//オブジェクトの削除
 				objects.erase(objects.begin() + i);
@@ -286,11 +369,6 @@ void Scene::Draw() const
 		obj->Draw();
 	}
 
-	DrawFormatString(10, 10, 0x00, "フレーム：%d", frame_count);
-	DrawFormatString(10, 30, 0x00, "時間：%d", time);
-	DrawFormatString(10, 50, 0x00, "score：%d", score);
-	DrawFormatString(10, 70, 0x00, "highscore：%d", highscore);
-
 	//スコア画像の描画
 	DrawRotaGraphF(150.0f, 465.0f, 1.1, 0, score_image, TRUE, 0);
 	//ハイスコア画像の描画
@@ -299,7 +377,6 @@ void Scene::Draw() const
 	DrawRotaGraphF(20.0f, 465.0f, 0.5, 0, timer_image, TRUE, 0);
 
 	UIDraw();
-
 }
 
 //終了時処理
@@ -365,27 +442,27 @@ void Scene::HitCheckObject(GameObject* a, GameObject* b)
 		//プレイヤーが弾に当たると制限時間を減らす
 		if (a->GetType() == TYPE::PLAYER && b->GetType() == TYPE::BULLET)
 		{
-			time -= 1;
+			time -= 2;
 		}
 		//ハーピーがボムに当たるとスコアを減らす
 		if (a->GetType() == TYPE::HARPY && b->GetType() == TYPE::BOMB)
 		{
-			score -= 1;
+			score -= 100;
 		}
 		//ハネテキがボムに当たるとスコアを増やす
 		if (a->GetType() == TYPE::FLY_ENEMY && b->GetType() == TYPE::BOMB)
 		{
-			score += 1;
+			score += 30;
 		}
 		//ハコテキがボムに当たるとスコアを増やす
 		if (a->GetType() == TYPE::BOX_ENEMY && b->GetType() == TYPE::BOMB)
 		{
-			score += 10;
+			score += 200;
 		}
 		//金のテキがボムに当たるとスコアを増やす
 		if (a->GetType() == TYPE::GORLD_ENEMY && b->GetType() == TYPE::BOMB)
 		{
-			score += 100;
+			score += 1500;
 		}
 	}
 }
@@ -421,9 +498,6 @@ void Scene::UIDraw() const
 		digit++;
 		s2 = s2 / 10;		//小さい位から順に省いていく
 	}
-
-	DrawFormatString(10, 90, 0x00, "digit：%d", digit);
-
 
 	//スコアを描画
 	while (digit > -1)

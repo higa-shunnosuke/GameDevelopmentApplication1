@@ -116,20 +116,6 @@ void Player::Movement()
 		vector.x -= 2.0f;
 	}
 	
-	//上下移動
-	if (InputControl::GetKey(KEY_INPUT_UP))
-	{
-		vector.y += -2.0f;
-	}
-	else if (InputControl::GetKey(KEY_INPUT_DOWN))
-	{
-		vector.y += 2.0f;
-	}
-	else
-	{
-		vector.y += 0.0f;
-	}
-	
 	//現在の位置座標を更新する
 	location += vector;
 }

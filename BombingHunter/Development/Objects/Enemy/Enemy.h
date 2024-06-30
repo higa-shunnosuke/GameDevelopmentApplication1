@@ -18,7 +18,9 @@ private:
 	int BlendMode;			//ブレンド値
 	int number[11];			//数字画像
 	int minus_image;		//マイナス画像
-	
+	int harpy_SE;			//ハーピーSE
+	int enemy_SE;			//エネミーSE
+	int gold_SE;			//金の敵SE
 public:
 	Enemy();
 	~Enemy();

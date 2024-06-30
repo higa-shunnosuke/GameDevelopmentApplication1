@@ -4,7 +4,8 @@
 
 
 //コンストラクタ
-Bullet::Bullet() :frame_count(0), animation_max(0), count(0), vector(0.0), Is_hit(false), Is_anim(false)
+Bullet::Bullet() :frame_count(0), animation_max(0), count(0), vector(0.0), Is_hit(false), Is_anim(false),
+SE(NULL)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -29,6 +30,9 @@ void Bullet::Initialize(int object_type)
 	animation[1] = LoadGraph("Resource/Images/bullet/2.png");
 	animation[2] = LoadGraph("Resource/Images/bullet/3.png");
 	animation[3] = LoadGraph("Resource/Images/bullet/4.png");
+
+	//音源の読み込み
+	SE = LoadSoundMem("Resource/sounds/bishi.wav");
 
 	//大きさの設定
 	box_size = 30.0f;
@@ -92,6 +96,8 @@ void Bullet::OnHitCollision(GameObject* hit_object)
 	//当たった時の処理
 	if (hit_object->GetType() == 0)
 	{
+		PlaySoundMem(SE, DX_PLAYTYPE_BACK);
+
 		Is_hit = true;
 		//当たり判定をなくす
 		box_size = Vector2D(0.0f);

@@ -14,6 +14,7 @@ private:
 	bool Is_hit;			//ヒットしたか
 	bool Is_anim;			//アニメーション終了フラグ
 	Player* player;			//プレイヤーのポインタ
+	int SE;					//効果音
 
 public:
 	Bullet();

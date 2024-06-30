@@ -14,6 +14,10 @@ typedef enum {
 	FLY_ENEMY,
 	BOX_ENEMY,
 	GORLD_ENEMY,
+	PERFECT,
+	GOOD,
+	OK,
+	BAD,
 } TYPE;
 
 class Scene
@@ -27,6 +31,7 @@ private:
 	int Enemy_count[4];		//敵の出現数
 	int Bomb_count;			//ボムの数
 	int background_image;	//背景画像
+	int background_sound;	//背景BGM
 	int timer_image;		//タイマー画像
 	int highscore_image;	//ハイスコア画像
 	int score_image;		//スコア画像
@@ -35,7 +40,10 @@ private:
 	int score;				//スコア
 	int highscore;			//ハイスコア
 	bool Is_pause;			//ポーズフラグ
-
+	int throw_SE;			//ボムを投げるSE
+	int explosion_SE;		//爆発SE
+	int timeup_SE;			//タイムアップSE
+	bool timeup;			//タイムアップフラグ
 
 public:
 	Scene();
