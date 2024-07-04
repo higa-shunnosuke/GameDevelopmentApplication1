@@ -1,12 +1,11 @@
 #include"Player.h"
 #include"../../Utility/InputControl.h"
+#include"../../Utility/ResourceManager.h"
 #include"DxLib.h"
 
 //コンストラクタ
 Player::Player():frame_count(0),flip_flag(FALSE),direction(0)
 {
-	animation[0] = NULL;
-	animation[1] = NULL;
 	Is_hit = false;
 }
 
@@ -19,9 +18,12 @@ Player::~Player()
 //初期化処理
 void Player::Initialize(int object_type)
 {
-	//画像の読み込み
-	animation[0] = LoadGraph("Resource/Images/Tri-pilot/1.png");
-	animation[1] = LoadGraph("Resource/Images/Tri-pilot/2.png");
+	//アニメーション画像を読み込む
+	ResourceManager* rm = ResourceManager::GetInstance();
+	tmp = rm->GetImages("Resource/Images/Tri-pilot/1.png");
+	animation.push_back(tmp[0]);
+	tmp = rm->GetImages("Resource/Images/Tri-pilot/2.png");
+	animation.push_back(tmp[0]);
 
 	//エラーチェック
 	if (animation[0]==-1||animation[1]==-1)

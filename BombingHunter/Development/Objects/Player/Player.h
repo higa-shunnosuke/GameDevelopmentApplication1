@@ -1,15 +1,17 @@
 #pragma once
 
 #include"../GameObject.h"
+#include"vector"
+
 
 class Player:public GameObject
 {
 private:
-	int animation[2];		//アニメーション画像
-	int frame_count;		//アニメーション時間
-	int flip_flag;			//反転フラグ
-	bool Is_hit;			//弾に当たったか
-	int direction;			//向き
+	int frame_count;			//アニメーション時間
+	int flip_flag;				//反転フラグ
+	bool Is_hit;				//弾に当たったか
+	int direction;				//向き
+	std::vector<int> animation;	//アニメーションデータ
 
 public:
 	Player();

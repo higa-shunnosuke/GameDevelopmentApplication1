@@ -1,6 +1,8 @@
 #pragma once
 
 #include"../Utility/Vector2D.h"
+#include"../Utility/ResourceManager.h"
+#include"vector"
 
 #define	D_PIVOT_CENTER		//座標の原点を画像の中心にする
 
@@ -8,6 +10,8 @@
 class GameObject
 {
 protected:
+	std::vector<int> tmp;		//データ保存用の変数
+
 	Vector2D location;	//位置情報
 	Vector2D box_size;	//大きさ
 	double radian;		//向き

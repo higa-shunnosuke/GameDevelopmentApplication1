@@ -138,6 +138,7 @@
     <ClCompile Include="Objects\Enemy\Bullet.cpp" />
     <ClCompile Include="Objects\Enemy\Enemy.cpp" />
     <ClCompile Include="Objects\GameObject.cpp" />
+    <ClCompile Include="Utility\ResourceManager.cpp" />
     <ClCompile Include="Utility\InputControl.cpp" />
     <ClCompile Include="Objects\Player\Player.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="Objects\Enemy\Bullet.h" />
     <ClInclude Include="Objects\Enemy\Enemy.h" />
     <ClInclude Include="Objects\GameObject.h" />
+    <ClInclude Include="Utility\ResourceManager.h" />
     <ClInclude Include="Utility\InputControl.h" />
     <ClInclude Include="Objects\Player\Player.h" />
     <ClInclude Include="Scene\Scene.h" />

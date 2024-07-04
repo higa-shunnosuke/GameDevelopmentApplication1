@@ -3,8 +3,11 @@
 #include"Utility/InputControl.h"
 
 //メイン関数（プログラムはここから始まります。）
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine, _In_ int nShowCmd)
+int WINAPI WinMain(
+	_In_ HINSTANCE hInstance, 
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPSTR lpCmdLine, 
+	_In_ int nShowCmd)
 {
 	//Windowモードで起動
 	ChangeWindowMode(TRUE);
@@ -21,6 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 
 	//ローカル変数定義
 	Scene* scene = new Scene();		//シーン情報
+	ResourceManager* rm = ResourceManager::GetInstance();	//リソース
 	int result = 0;					//終了状態情報
 
 	//描画先を裏画面から始めるように指定する
@@ -65,6 +69,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 		delete scene;
 		scene = nullptr;
 	}
+
+	//読み込んだ画像の解放
+	rm->UnloadResourcesAll();
+	//リソース管理のインスタンスを削除する
+	ResourceManager::DeleteInstance();
 
 	//DXライブラリの終了処理
 	DxLib_End();

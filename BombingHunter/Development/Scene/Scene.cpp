@@ -119,7 +119,7 @@ void Scene::Initialize()
 	frame_count = 0;
 
 	//§ŒÀŠÔ‚Ì‰Šú‰»
-	time = 60;
+	time = 1;
 
 	image = number[0];
 
@@ -151,9 +151,8 @@ void Scene::Update()
 		if (timeup == false)
 		{
 			StopSoundMem(background_sound);
-			//DeleteSoundMem(background_sound);
 			PlaySoundMem(timeup_SE, DX_PLAYTYPE_BACK);
-			Finalize();
+			
 			frame_count = 0;
 
 			p = CreateObject<Player>(Vector2D(320.0f, 50.0f), TYPE::PLAYER);
