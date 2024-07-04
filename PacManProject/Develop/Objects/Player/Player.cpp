@@ -321,16 +321,16 @@ void Player::Movement(float delta_second)
 	switch(now_direction_state)
 	{
 		case Player::UP:
-			velocity.y = -1.0f;
+			velocity.y = -5.0f;
 			break;
 		case Player::DOWN:
-			velocity.y = 1.0f;
+			velocity.y = 5.0f;
 			break;
 		case Player::LEFT:
-			velocity.x = -1.0f;
+			velocity.x = -5.0f;
 			break;
 		case Player::RIGHT:
-			velocity.x = 1.0f;
+			velocity.x = 5.0f;
 			break;
 		default:
 			velocity = 0.0f;
@@ -346,16 +346,16 @@ void Player::Movement(float delta_second)
 		switch(next_direction_state)
 		{
 			case Player::UP:
-				velocity.y = -1.0f;
+				velocity.y = -5.0f;
 				break;
 			case Player::RIGHT:
-				velocity.x = 1.0f;
+				velocity.x = 5.0f;
 				break;
 			case Player::DOWN:
-				velocity.y = 1.0f;
+				velocity.y = 5.0f;
 				break;
 			case Player::LEFT:
-				velocity.x = -1.0f;
+				velocity.x = -5.0f;
 				break;
 			default:
 				break;

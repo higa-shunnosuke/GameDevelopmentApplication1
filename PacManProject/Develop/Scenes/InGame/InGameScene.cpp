@@ -56,7 +56,7 @@ eSceneType InGameScene::Update(const float& delta_second)
 		__super::Update(delta_second);
 
 		// 全ての餌を食べたら、再スタート
-		if (player->GetFoodCount() >= 244)
+		if (player->GetFoodCount() >= 246)
 		{
 			return eSceneType::re_start;
 		}

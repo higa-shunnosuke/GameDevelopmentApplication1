@@ -50,7 +50,7 @@ void StageData::Load()
 		switch((*mode.c_str()))
 		{
 			case 'G':
-				id = ePanelID::GATE;	// idをWALLにする
+				id = ePanelID::GATE;	// idをGATEにする
 			case '#':
 			{
 				// 挿入開始地点と挿入数を取得
