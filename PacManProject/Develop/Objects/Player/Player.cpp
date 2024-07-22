@@ -6,6 +6,8 @@
 
 #define D_PLAYER_SPEED	(50.0f)
 
+int x, y;
+
 Player::Player() :
 	move_animation(),
 	dying_animation(),
@@ -54,6 +56,9 @@ void Player::Initialize()
 
 void Player::Update(float delta_second)
 {
+	x = 0, y = 0;
+	StageData::ConvertToIndex(location, y, x);
+
 	// プレイヤー状態によって、動作を変える
 	switch(player_state)
 	{
@@ -93,6 +98,9 @@ void Player::Draw(const Vector2D& screen_offset) const
 {
 	// 親クラスの描画処理を呼び出す
 	__super::Draw(screen_offset);
+
+	DrawFormatString(10, 10, 0x00ff00, "%d", x);
+	DrawFormatString(10, 30, 0x00ff00, "%d", y);
 }
 
 void Player::Finalize()
@@ -321,16 +329,16 @@ void Player::Movement(float delta_second)
 	switch(now_direction_state)
 	{
 		case Player::UP:
-			velocity.y = -5.0f;
+			velocity.y = -1.0f;
 			break;
 		case Player::DOWN:
-			velocity.y = 5.0f;
+			velocity.y = 1.0f;
 			break;
 		case Player::LEFT:
-			velocity.x = -5.0f;
+			velocity.x = -1.0f;
 			break;
 		case Player::RIGHT:
-			velocity.x = 5.0f;
+			velocity.x = 1.0f;
 			break;
 		default:
 			velocity = 0.0f;
@@ -346,16 +354,16 @@ void Player::Movement(float delta_second)
 		switch(next_direction_state)
 		{
 			case Player::UP:
-				velocity.y = -5.0f;
+				velocity.y = -1.0f;
 				break;
 			case Player::RIGHT:
-				velocity.x = 5.0f;
+				velocity.x = 1.0f;
 				break;
 			case Player::DOWN:
-				velocity.y = 5.0f;
+				velocity.y = 1.0f;
 				break;
 			case Player::LEFT:
-				velocity.x = -5.0f;
+				velocity.x = -1.0f;
 				break;
 			default:
 				break;

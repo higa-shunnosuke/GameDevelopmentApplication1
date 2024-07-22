@@ -49,6 +49,7 @@ public:
 	/// </summary>
 	virtual void Initialize()
 	{
+
 	}
 
 	/// <summary>
