@@ -3,7 +3,8 @@
 //‰Šú‰»ˆ—
 void Pinky::Initialize()
 {
-
+	// ƒŒƒCƒ„[‚Ìİ’è
+	z_layer = 7;
 }
 
 /// <summary>

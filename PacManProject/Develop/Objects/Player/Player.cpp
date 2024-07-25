@@ -4,7 +4,7 @@
 #include "DxLib.h"
 #include "../Food/Food.h"
 
-#define D_PLAYER_SPEED	(50.0f)
+#define D_PLAYER_SPEED	(75.0f)
 
 int x, y;
 

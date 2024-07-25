@@ -3,7 +3,8 @@
 //‰Šú‰»ˆ—
 void Inky::Initialize()
 {
-
+	// ƒŒƒCƒ„[‚Ìİ’è
+	z_layer = 8;
 }
 
 /// <summary>

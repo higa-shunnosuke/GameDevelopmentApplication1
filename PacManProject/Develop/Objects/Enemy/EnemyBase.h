@@ -9,7 +9,7 @@ enum eEnemyState
 	WAIT,		//待機
 	TERRITORY,	//縄張り
 	TRACKING,	//追跡
-	SCAARED,	//いじけ
+	SCARED,		//いじけ
 	ESCAPE,		//戻る
 };
 
@@ -41,12 +41,13 @@ private:
 	int					animation_count;	//アニメーション添え字
 	float				time;				//各状態の持ち時間
 	int					flash_count;		//点滅カウント用の変数
-	eEnemyType			enemytype;			//エネミーの種類
+	eEnemyType			enemy_type;			//エネミーの種類
+	int i;
 
 protected:
 	Vector2D			velocity;			//移動量
 	eEnemyState			enemy_state;		//エネミー状態
-	eDirectionState		direction;			//進行方向状態
+	eDirectionState		direction_state;	//進行方向状態
 	Player*				player;				//プレイヤーのポインタ
 	
 public:
@@ -75,7 +76,6 @@ public:
 	/// <returns>エネミーの状態</returns>
 	eEnemyState GetEnemyState() const;
 
-private:
 	/// <summary>
 	/// プレイヤーのポインタ受け取り処理
 	/// </summary>
@@ -83,10 +83,18 @@ private:
 	void SetPlayer(Player* player);
 
 	/// <summary>
+	/// エネミー種類設定処理
+	/// </summary>
+	/// <param name="type">エネミーの種類</param>
+	void SetType(int type);
+
+private:
+	/// <summary>
 	/// エネミー状態変更処理
 	/// </summary>
-	void ChengeState();
+	//void ChangeState();
 
+	
 	/// <summary>
 	/// 持ち時間制御
 	/// </summary>
@@ -97,6 +105,12 @@ private:
 	/// </summary>
 	/// <param name="delta_second">1フレームあたりの時間</param>
 	void AnimationControl(float delta_second);
+
+	/// <summary>
+	/// 移動処理
+	/// </summary>
+	/// <param name="delta_second">1フレームあたりの時間</param>
+	void Movement(float delta_second);
 
 	/// <summary>
 	/// 移動処理

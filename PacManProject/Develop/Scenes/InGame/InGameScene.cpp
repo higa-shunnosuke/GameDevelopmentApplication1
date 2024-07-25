@@ -11,6 +11,7 @@
 
 InGameScene::InGameScene() 
 	: player(nullptr)
+	, enemy(nullptr)
 	, back_ground_image(NULL)
 	, back_ground_sound(NULL)
 	, pause_flag(false)
@@ -191,7 +192,9 @@ void InGameScene::LoadStageMapCSV()
 			// エネミー
 			case 'E':
 				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
-				CreateObject<EnemyBase>(generate_location);
+				enemy = CreateObject<EnemyBase>(generate_location);
+				enemy->SetPlayer(player);
+				enemy->SetType(enemy_count);
 				enemy_count++;
 				break;
 			// 上記以外

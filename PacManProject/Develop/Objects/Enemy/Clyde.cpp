@@ -3,7 +3,8 @@
 //‰Šú‰»ˆ—
 void Clyde::Initialize()
 {
-
+	// ƒŒƒCƒ„[‚Ìİ’è
+	z_layer = 9;
 }
 
 /// <summary>

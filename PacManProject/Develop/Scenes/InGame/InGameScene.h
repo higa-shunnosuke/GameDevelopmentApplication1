@@ -6,6 +6,7 @@ class InGameScene : public SceneBase
 {
 private:
 	class Player* player;		// プレイヤー情報
+	class EnemyBase* enemy;		// プレイヤー情報
 	int back_ground_image;		// 背景画像
 	int back_ground_sound;		// BGM
 	bool pause_flag;			// 一時停止フラグ
