@@ -7,9 +7,9 @@
 enum eEnemyState
 {
 	WAIT,		//待機
-	TERRITORY,	//縄張り
-	TRACKING,	//追跡
-	SCARED,		//いじけ
+	SCATTER,	//縄張り
+	CHASE,		//追跡
+	FRIGHTENED,	//いじけ
 	ESCAPE,		//戻る
 };
 

@@ -96,7 +96,7 @@ void EnemyBase::Finalize()
 void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 {
 	//いじけ状態のとき
-	if (enemy_state == eEnemyState::SCARED)
+	if (enemy_state == eEnemyState::FRIGHTENED)
 	{
 		// 当たったオブジェクトがプレイヤーだったら
 		if (hit_object->GetCollision().object_type == eObjectType::enemy)
@@ -197,18 +197,18 @@ void EnemyBase::AnimationControl(float delta_second)
 void EnemyBase::Movement(float delta_second)
 {
 	// エネミー状態によって、動作を変える
-	/*switch (enemy_state)
+	switch (enemy_state)
 	{
 	case WAIT:
 		WaitMovement(delta_second);
 		break;
-	case TERRITORY:
+	case SCATTER:
 		TerritoryMovement(delta_second);
 		break;
-	case TRACKING:
+	case CHASE:
 		TrackingMovement(delta_second);
 		break;
-	case SCARED:
+	case FRIGHTENED:
 		ScaredMovement(delta_second);
 		break;
 	case ESCAPE:
@@ -216,32 +216,26 @@ void EnemyBase::Movement(float delta_second)
 		break;
 	default:
 		break;
-	}*/
+	}
 
 	// 入力状態の取得
 	InputManager* input = InputManager::GetInstance();
 
+	if (input->GetKeyDown(KEY_INPUT_SPACE))
+	{
+		if (i < 4)
+		{
+			i++;
+		}
+		else
+		{
+			i = 0;
+		}
+	}
+
+
 	if (enemy_type == i)
 	{	
-		if (input->GetKeyDown(KEY_INPUT_SPACE))
-		{
-			switch (enemy_type)
-			{
-			case EnemyBase::blinky:
-				i++;
-				break;
-			case EnemyBase::pinky:
-				i++;
-				break;
-			case EnemyBase::inky:
-				i++;
-				break;
-			case EnemyBase::clyde:
-				i = 0;
-				break;
-			}
-		}
-
 		if (input->GetKeyDown(KEY_INPUT_W))
 		{
 			direction_state = eDirectionState::UP;
@@ -281,7 +275,7 @@ void EnemyBase::Movement(float delta_second)
 		}
 
 		// 移動量 * 速さ * 時間 で移動先を決定する
-		location += velocity * 50 * delta_second;
+		location += velocity * 75.0f * delta_second;
 	}
 }
 
