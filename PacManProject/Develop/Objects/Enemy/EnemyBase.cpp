@@ -16,7 +16,7 @@ EnemyBase::EnemyBase():
 	flash_count(0),
 	enemy_type(eEnemyType::blinky),
 	velocity(0.0f),
-	enemy_state(eEnemyState::WAIT),
+	enemy_state(eEnemyState::CHASE),
 	direction_state(eDirectionState::LEFT),
 	player(nullptr),
 	i(0)
@@ -110,7 +110,7 @@ void EnemyBase::Finalize()
 /// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
 void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 {
-	if (enemy_state != eEnemyState::WAIT)
+	if (enemy_state != eEnemyState::WAIT && enemy_state != eEnemyState::ESCAPE)
 	{
 		// 当たった、オブジェクトが壁だったら
 		if (hit_object->GetCollision().object_type == eObjectType::wall)
@@ -367,6 +367,7 @@ void EnemyBase::Movement(float delta_second)
 /// <param name="delta_second">1フレームあたりの時間</param>
 void EnemyBase::WaitMovement(float delta_second)
 {
+	
 
 }
 
@@ -409,7 +410,7 @@ void EnemyBase::EscapeMovement(float delta_second)
 /// <summary>
 /// 目標設定処理
 /// </summary>
-void EnemyBase::SetDirection()
+void EnemyBase::SetDestination()
 {
 
 }

@@ -139,7 +139,7 @@ private:
 	/// <summary>
 	/// 目標設定処理
 	/// </summary>
-	void SetDirection();
+	void SetDestination();
 
 protected:
 	/// <summary>
