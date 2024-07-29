@@ -64,8 +64,11 @@ void EnemyBase::Update(float delta_second)
 //更新処理
 void EnemyBase::Draw(const Vector2D& screen_offset) const
 {
-	// 親クラスの描画処理を呼び出す
-	__super::Draw(screen_offset);
+	if (enemy_state != eEnemyState::ESCAPE)
+	{
+		// 親クラスの描画処理を呼び出す
+		__super::Draw(screen_offset);
+	}
 
 	if (enemy_state != eEnemyState::FRIGHTENED)
 	{
@@ -111,7 +114,7 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 	if (enemy_state == eEnemyState::FRIGHTENED)
 	{
 		// 当たったオブジェクトがプレイヤーだったら
-		if (hit_object->GetCollision().object_type == eObjectType::enemy)
+		if (hit_object->GetCollision().object_type == eObjectType::player)
 		{
 			enemy_state = eEnemyState::ESCAPE;
 		}
@@ -183,7 +186,7 @@ void EnemyBase::SetType(int type)
 /// </summary>
 void EnemyBase::ChangeState()
 {
-	if (player->GetPowerUp() == true)
+	if (player->GetPowerUp() == true && enemy_state != eEnemyState::ESCAPE)
 	{
 		enemy_state = eEnemyState::FRIGHTENED;
 	}
@@ -209,6 +212,7 @@ void EnemyBase::AnimationControl(float delta_second)
 	{
 		animation_time = 0.0f;
 		animation_count++;
+
 		if (animation_count >= 2)
 		{
 			animation_count = 0;
@@ -216,10 +220,12 @@ void EnemyBase::AnimationControl(float delta_second)
 		// 画像の設定
 		if (enemy_state != eEnemyState::ESCAPE)
 		{
+			//いじけ状態のとき
 			if (enemy_state == eEnemyState::FRIGHTENED)
 			{
 				image = move_animation[16 + animation_count];
 			}
+			//いじけ状態ではないとき
 			else
 			{
 				image = move_animation[enemy_type * 2 + animation_count];

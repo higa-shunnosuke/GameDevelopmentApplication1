@@ -154,7 +154,10 @@ void Player::OnHitCollision(GameObjectBase* hit_object)
 	// 当たったオブジェクトが敵だったら
 	if(hit_object->GetCollision().object_type == eObjectType::enemy)
 	{
-		player_state = ePlayerState::DIE;
+		if (is_power_up != true)
+		{
+			player_state = ePlayerState::DIE;
+		}
 	}
 }
 
