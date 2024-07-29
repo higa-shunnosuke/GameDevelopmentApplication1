@@ -321,6 +321,18 @@ void EnemyBase::Movement(float delta_second)
 
 		// 移動量 * 速さ * 時間 で移動先を決定する
 		location += velocity * 50.0f * delta_second;
+
+		// 画面外に行ったら、反対側にワープさせる
+		if (location.x < 0.0f)
+		{
+			location.x = 672.0f - collision.radius;
+			velocity.y = 0.0f;
+		}
+		if (672.0f < location.x)
+		{
+			location.x = collision.radius;
+			velocity.y = 0.0f;
+		}
 	}
 }
 
