@@ -16,7 +16,7 @@ EnemyBase::EnemyBase():
 	flash_count(0),
 	enemy_type(eEnemyType::blinky),
 	velocity(0.0f),
-	enemy_state(eEnemyState::CHASE),
+	enemy_state(eEnemyState::WAIT),
 	direction_state(eDirectionState::LEFT),
 	player(nullptr),
 	i(0)
@@ -174,30 +174,27 @@ void EnemyBase::SetType(int type)
 	switch (type)
 	{
 	case 0:
+		//アカベイ
 		enemy_type = eEnemyType::blinky;
-
 		// レイヤーの設定
 		z_layer = 6;
 
 		break;
 	case 1:
+		//アオスケ
 		enemy_type = eEnemyType::inky;
-
-		// レイヤーの設定
 		z_layer = 8;
 
 		break;
 	case 2:
+		//グズタ
 		enemy_type = eEnemyType::clyde;
-
-		// レイヤーの設定
 		z_layer = 7;
 
 		break;
 	case 3:
+		//ピンキー
 		enemy_type = eEnemyType::pinky;
-
-		// レイヤーの設定
 		z_layer = 9;
 
 		break;
