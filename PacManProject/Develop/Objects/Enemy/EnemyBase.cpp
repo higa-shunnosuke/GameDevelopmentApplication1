@@ -110,26 +110,29 @@ void EnemyBase::Finalize()
 /// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
 void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 {
-	// 当たった、オブジェクトが壁だったら
-	if (hit_object->GetCollision().object_type == eObjectType::wall)
+	if (enemy_state != eEnemyState::WAIT)
 	{
-		// 当たり判定情報を取得して、カプセルがある位置を求める
-		CapsuleCollision hc = hit_object->GetCollision();
-		hc.point[0] += hit_object->GetLocation();
-		hc.point[1] += hit_object->GetLocation();
+		// 当たった、オブジェクトが壁だったら
+		if (hit_object->GetCollision().object_type == eObjectType::wall)
+		{
+			// 当たり判定情報を取得して、カプセルがある位置を求める
+			CapsuleCollision hc = hit_object->GetCollision();
+			hc.point[0] += hit_object->GetLocation();
+			hc.point[1] += hit_object->GetLocation();
 
-		// 最近傍点を求める
-		Vector2D near_point = NearPointCheck(hc, this->location);
+			// 最近傍点を求める
+			Vector2D near_point = NearPointCheck(hc, this->location);
 
-		// Playerからnear_pointへの方向ベクトルを取得
-		Vector2D dv2 = near_point - this->location;
-		Vector2D dv = this->location - near_point;
+			// Playerからnear_pointへの方向ベクトルを取得
+			Vector2D dv2 = near_point - this->location;
+			Vector2D dv = this->location - near_point;
 
-		// めり込んだ差分
-		float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
+			// めり込んだ差分
+			float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
 
-		// diffの分だけ戻る
-		location += dv.Normalize() * diff;
+			// diffの分だけ戻る
+			location += dv.Normalize() * diff;
+		}
 	}
 
 	//いじけ状態のとき
