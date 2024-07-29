@@ -92,7 +92,7 @@ private:
 	/// <summary>
 	/// エネミー状態変更処理
 	/// </summary>
-	//void ChangeState();
+	void ChangeState();
 
 	
 	/// <summary>

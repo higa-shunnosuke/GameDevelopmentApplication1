@@ -3,8 +3,7 @@
 //‰Šú‰»ˆ—
 void Blinky::Initialize()
 {
-	// ƒŒƒCƒ„[‚Ìİ’è
-	z_layer = 6;
+	
 }
 
 /// <summary>

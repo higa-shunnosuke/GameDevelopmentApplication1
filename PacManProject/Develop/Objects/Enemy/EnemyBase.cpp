@@ -1,6 +1,10 @@
 #include "EnemyBase.h"
 #include "../../Utility/ResourceManager.h"
 #include "DxLib.h"
+#include "Blinky.h"
+#include "Pinky.h"
+#include "Inky.h"
+#include "Clyde.h"
 #include "../../Utility/InputManager.h"
 
 EnemyBase::EnemyBase():
@@ -53,6 +57,8 @@ void EnemyBase::Update(float delta_second)
 	// アニメーション制御
 	AnimationControl(delta_second);
 
+	/// エネミー状態変更処理
+	ChangeState();
 }
 
 //更新処理
@@ -61,10 +67,13 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	// 親クラスの描画処理を呼び出す
 	__super::Draw(screen_offset);
 
-	// オフセット値を基に画像の描画を行う
-	Vector2D graph_location = this->location + screen_offset;
-	DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
-
+	if (enemy_state != eEnemyState::FRIGHTENED)
+	{
+		// オフセット値を基に画像の描画を行う
+		Vector2D graph_location = this->location + screen_offset;
+		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
+	}
+	
 	switch (enemy_type)
 	{
 	case EnemyBase::blinky:
@@ -80,6 +89,9 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 		DrawFormatString(10, 110, 0xffff00, "%d", i);
 		break;
 	}
+
+	//状態描画処理
+	DrawFormatString(10, 130, 0xffffff, "%d", enemy_state);
 }
 
 //終了時処理
@@ -135,28 +147,47 @@ void EnemyBase::SetType(int type)
 	{
 	case 0:
 		enemy_type = eEnemyType::blinky;
+
+		// レイヤーの設定
+		z_layer = 6;
+
 		break;
 	case 1:
 		enemy_type = eEnemyType::inky;
+
+		// レイヤーの設定
+		z_layer = 8;
+
 		break;
 	case 2:
 		enemy_type = eEnemyType::clyde;
+
+		// レイヤーの設定
+		z_layer = 7;
+
 		break;
 	case 3:
 		enemy_type = eEnemyType::pinky;
+
+		// レイヤーの設定
+		z_layer = 9;
+
 		break;
 	default:
 		break;
 	}
 }
 
-///// <summary>
-///// エネミー状態変更処理
-///// </summary>
-//void EnemyBase::ChangeState()
-//{
-//
-//}
+/// <summary>
+/// エネミー状態変更処理
+/// </summary>
+void EnemyBase::ChangeState()
+{
+	if (player->GetPowerUp() == true)
+	{
+		enemy_state = eEnemyState::FRIGHTENED;
+	}
+}
 
 /// <summary>
 /// 持ち時間制御
@@ -185,8 +216,16 @@ void EnemyBase::AnimationControl(float delta_second)
 		// 画像の設定
 		if (enemy_state != eEnemyState::ESCAPE)
 		{
-			image = move_animation[enemy_type * 2 + animation_count];
+			if (enemy_state == eEnemyState::FRIGHTENED)
+			{
+				image = move_animation[16 + animation_count];
+			}
+			else
+			{
+				image = move_animation[enemy_type * 2 + animation_count];
+			}
 		}
+	
 	}
 }
 
@@ -275,7 +314,7 @@ void EnemyBase::Movement(float delta_second)
 		}
 
 		// 移動量 * 速さ * 時間 で移動先を決定する
-		location += velocity * 75.0f * delta_second;
+		location += velocity * 50.0f * delta_second;
 	}
 }
 
