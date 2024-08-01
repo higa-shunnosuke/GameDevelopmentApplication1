@@ -42,13 +42,15 @@ private:
 	float				time;				//各状態の持ち時間
 	int					flash_count;		//点滅カウント用の変数
 	eEnemyType			enemy_type;			//エネミーの種類
-	int i;
+	int					i;					//
+	EnemyBase*			enemy;				//エネミー情報
+	int					x, y;				//パネル保存用の変数
 
 protected:
 	Vector2D			velocity;			//移動量
 	eEnemyState			enemy_state;		//エネミー状態
 	eDirectionState		direction_state;	//進行方向状態
-	Player*				player;				//プレイヤーのポインタ
+	Player*				player;				//プレイヤー情報
 	
 public:
 	EnemyBase();
@@ -86,7 +88,7 @@ public:
 	/// エネミー種類設定処理
 	/// </summary>
 	/// <param name="type">エネミーの種類</param>
-	void SetType(int type);
+	void SetType();
 
 private:
 	/// <summary>

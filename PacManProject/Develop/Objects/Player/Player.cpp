@@ -99,8 +99,9 @@ void Player::Draw(const Vector2D& screen_offset) const
 	// 親クラスの描画処理を呼び出す
 	__super::Draw(screen_offset);
 
-	DrawFormatString(10, 10, 0x00ff00, "%d", x);
-	DrawFormatString(10, 30, 0x00ff00, "%d", y);
+#if _DEBUG
+	DrawFormatString(10, 40, 0xffff00, "%2d,%2d", x,y);
+#endif
 }
 
 void Player::Finalize()

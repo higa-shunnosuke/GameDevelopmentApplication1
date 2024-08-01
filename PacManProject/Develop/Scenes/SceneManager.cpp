@@ -81,6 +81,8 @@ void SceneManager::Run()
 		// シーンの更新
 		eSceneType next_scene_type = current_scene->Update(GetDeltaSecond());
 
+		SetFontSize(32);
+
 		// 描画処理
 		Graph();
 

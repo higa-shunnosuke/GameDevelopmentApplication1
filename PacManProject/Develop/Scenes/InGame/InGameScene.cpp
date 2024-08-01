@@ -156,9 +156,6 @@ void InGameScene::LoadStageMapCSV()
 	// ファイルから1行ずつ読み込む
 	std::string line;
 
-	//敵の数のカウント
-	int enemy_count = 0;
-
 	while (std::getline(ifs, line))
 	{
 		// 文字列を書式指定で分解して値を各変数に格納する
@@ -194,8 +191,7 @@ void InGameScene::LoadStageMapCSV()
 				generate_location = (Vector2D((float)(spos_x - 1), (float)(spos_y - 1)) * D_OBJECT_SIZE) + (D_OBJECT_SIZE / 2.0f);
 				enemy = CreateObject<EnemyBase>(generate_location);
 				enemy->SetPlayer(player);
-				enemy->SetType(enemy_count);
-				enemy_count++;
+				enemy->SetType();
 				break;
 			// 上記以外
 			default:

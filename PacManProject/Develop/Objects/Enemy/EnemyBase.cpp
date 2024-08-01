@@ -19,7 +19,9 @@ EnemyBase::EnemyBase():
 	enemy_state(eEnemyState::WAIT),
 	direction_state(eDirectionState::LEFT),
 	player(nullptr),
-	i(0)
+	i(0),
+	enemy(nullptr),
+	x(0),y(0)
 {
 
 }
@@ -51,6 +53,9 @@ void EnemyBase::Initialize()
 //更新処理
 void EnemyBase::Update(float delta_second)
 {
+	//パネルの確認
+	StageData::ConvertToIndex(location, y, x);
+
 	//移動処理
 	Movement(delta_second);
 
@@ -77,24 +82,24 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
 	}
 	
+#if _DEBUG
+
 	switch (enemy_type)
 	{
 	case EnemyBase::blinky:
-		DrawFormatString(10, 50, 0xff0000, "%d", i);
+		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y,enemy_state);
 		break;
 	case EnemyBase::pinky:
-		DrawFormatString(10, 70, 0xffa0ff, "%d", i);
+		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, enemy_state);
 		break;
 	case EnemyBase::inky:
-		DrawFormatString(10, 90, 0x00ffff, "%d", i);
+		DrawFormatString(390, 40, 0x00ffff, "%2d,%2d,%d", x,y, enemy_state);
 		break;
 	case EnemyBase::clyde:
-		DrawFormatString(10, 110, 0xffff00, "%d", i);
+		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, enemy_state);
 		break;
 	}
-
-	//状態描画処理
-	DrawFormatString(10, 130, 0xffffff, "%d", enemy_state);
+#endif
 }
 
 //終了時処理
@@ -110,8 +115,8 @@ void EnemyBase::Finalize()
 /// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
 void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 {
-	if (enemy_state != eEnemyState::WAIT && enemy_state != eEnemyState::ESCAPE)
-	{
+	/*if (enemy_state != eEnemyState::WAIT && enemy_state != eEnemyState::ESCAPE)
+	{*/
 		// 当たった、オブジェクトが壁だったら
 		if (hit_object->GetCollision().object_type == eObjectType::wall)
 		{
@@ -123,7 +128,7 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 			// 最近傍点を求める
 			Vector2D near_point = NearPointCheck(hc, this->location);
 
-			// Playerからnear_pointへの方向ベクトルを取得
+			//Enemyからnear_pointへの方向ベクトルを取得
 			Vector2D dv2 = near_point - this->location;
 			Vector2D dv = this->location - near_point;
 
@@ -133,7 +138,7 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 			// diffの分だけ戻る
 			location += dv.Normalize() * diff;
 		}
-	}
+	/*}*/
 
 	//いじけ状態のとき
 	if (enemy_state == eEnemyState::FRIGHTENED)
@@ -169,34 +174,32 @@ void EnemyBase::SetPlayer(Player* player)
 /// エネミー種類設定処理
 /// </summary>
 /// <param name="type">エネミーの種類</param>
-void EnemyBase::SetType(int type)
+void EnemyBase::SetType()
 {
-	switch (type)
+	StageData::ConvertToIndex(location, y, x);
+
+	switch (x)
 	{
-	case 0:
+	case 13:
 		//アカベイ
 		enemy_type = eEnemyType::blinky;
 		// レイヤーの設定
 		z_layer = 6;
-
 		break;
-	case 1:
+	case 12:
 		//アオスケ
 		enemy_type = eEnemyType::inky;
 		z_layer = 8;
-
 		break;
-	case 2:
+	case 16:
 		//グズタ
 		enemy_type = eEnemyType::clyde;
-		z_layer = 7;
-
+		z_layer = 9;
 		break;
-	case 3:
+	case 14:
 		//ピンキー
 		enemy_type = eEnemyType::pinky;
-		z_layer = 9;
-
+		z_layer = 7;
 		break;
 	default:
 		break;
