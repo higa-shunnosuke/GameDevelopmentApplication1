@@ -183,22 +183,30 @@ void EnemyBase::SetType()
 	case 13:
 		//アカベイ
 		enemy_type = eEnemyType::blinky;
+		enemy = dynamic_cast<EnemyBase*>(new Blinky());
+		enemy->Initialize();
 		// レイヤーの設定
 		z_layer = 6;
 		break;
 	case 12:
 		//アオスケ
 		enemy_type = eEnemyType::inky;
+		enemy = dynamic_cast<EnemyBase*>(new Inky());
+		enemy->Initialize();
 		z_layer = 8;
 		break;
 	case 16:
 		//グズタ
 		enemy_type = eEnemyType::clyde;
+		enemy = dynamic_cast<EnemyBase*>(new Clyde());
+		enemy->Initialize();
 		z_layer = 9;
 		break;
 	case 14:
 		//ピンキー
 		enemy_type = eEnemyType::pinky;
+		enemy = dynamic_cast<EnemyBase*>(new Pinky());
+		enemy->Initialize();
 		z_layer = 7;
 		break;
 	default:
