@@ -45,6 +45,8 @@ private:
 	int					i;					//
 	EnemyBase*			enemy;				//エネミー情報
 	int					x, y;				//パネル保存用の変数
+	int					dot_counter;		//ドットカウンター
+	int					dot_limit;			//ドット制限
 
 protected:
 	Vector2D			velocity;			//移動量
@@ -117,26 +119,22 @@ private:
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="delta_second">1フレームあたりの時間</param>
-	void WaitMovement(float delta_second);
+	void WaitMovement();
 
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="delta_second">1フレームあたりの時間</param>
-	void TerritoryMovement(float delta_second);
+	void TerritoryMovement();
 
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="delta_second">1フレームあたりの時間</param>
-	void ScaredMovement(float delta_second);
+	void ScaredMovement();
 
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="delta_second">1フレームあたりの時間</param>
-	void EscapeMovement(float delta_second);
+	void EscapeMovement();
 
 	/// <summary>
 	/// 目標設定処理
@@ -147,6 +145,5 @@ protected:
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	/// <param name="delta_second">1フレームあたりの時間</param>
-	virtual void TrackingMovement(float delta_second);
+	virtual void TrackingMovement();
 };

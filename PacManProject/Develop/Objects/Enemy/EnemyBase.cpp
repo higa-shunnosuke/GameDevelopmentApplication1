@@ -21,7 +21,9 @@ EnemyBase::EnemyBase():
 	player(nullptr),
 	i(0),
 	enemy(nullptr),
-	x(0),y(0)
+	x(0),y(0),
+	dot_counter(0),
+	dot_limit(0)
 {
 
 }
@@ -218,7 +220,52 @@ void EnemyBase::SetType()
 /// エネミー状態変更処理
 /// </summary>
 void EnemyBase::ChangeState()
-{
+{	
+	//待機状態を解除する
+	switch (enemy_type)
+	{
+	case EnemyBase::blinky:
+		break;
+	case EnemyBase::pinky:
+		break;
+	case EnemyBase::inky:
+		if (0 < player->GetFoodCount() - dot_counter)
+		{
+			dot_counter = player->GetFoodCount();
+
+			if (dot_limit >= 29)
+			{
+				enemy_state = eEnemyState::SCATTER;
+				dot_limit = 0;
+			}
+			else
+			{
+				dot_limit++;
+			}
+		}
+		break;
+	case EnemyBase::clyde:
+		if (0 < player->GetFoodCount() - dot_counter)
+		{
+			dot_counter = player->GetFoodCount();
+
+			if (dot_limit >= 30 + 59)
+			{
+				enemy_state = eEnemyState::SCATTER;
+				dot_limit = 0;
+			}
+			else
+			{
+				dot_limit++;
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	
+	//いじけ状態にする
 	if (player->GetPowerUp() == true && enemy_state != eEnemyState::ESCAPE)
 	{
 		enemy_state = eEnemyState::FRIGHTENED;
@@ -251,6 +298,7 @@ void EnemyBase::AnimationControl(float delta_second)
 			animation_count = 0;
 		}
 		// 画像の設定
+		//死んだときはアニメーションしない
 		if (enemy_state != eEnemyState::ESCAPE)
 		{
 			//いじけ状態のとき
@@ -278,19 +326,19 @@ void EnemyBase::Movement(float delta_second)
 	switch (enemy_state)
 	{
 	case WAIT:
-		WaitMovement(delta_second);
+		WaitMovement();
 		break;
 	case SCATTER:
-		TerritoryMovement(delta_second);
+		TerritoryMovement();
 		break;
 	case CHASE:
-		TrackingMovement(delta_second);
+		TrackingMovement();
 		break;
 	case FRIGHTENED:
-		ScaredMovement(delta_second);
+		ScaredMovement();
 		break;
 	case ESCAPE:
-		EscapeMovement(delta_second);
+		EscapeMovement();
 		break;
 	default:
 		break;
@@ -373,9 +421,9 @@ void EnemyBase::Movement(float delta_second)
 /// 移動処理
 /// </summary>
 /// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::WaitMovement(float delta_second)
+void EnemyBase::WaitMovement()
 {
-	
+
 
 }
 
@@ -383,16 +431,7 @@ void EnemyBase::WaitMovement(float delta_second)
 /// 移動処理
 /// </summary>
 /// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::TerritoryMovement(float delta_second)
-{
-
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::TrackingMovement(float delta_second)
+void EnemyBase::TerritoryMovement()
 {
 
 }
@@ -401,7 +440,7 @@ void EnemyBase::TrackingMovement(float delta_second)
 /// 移動処理
 /// </summary>
 /// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::ScaredMovement(float delta_second)
+void EnemyBase::TrackingMovement()
 {
 
 }
@@ -410,7 +449,16 @@ void EnemyBase::ScaredMovement(float delta_second)
 /// 移動処理
 /// </summary>
 /// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::EscapeMovement(float delta_second)
+void EnemyBase::ScaredMovement()
+{
+
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+/// <param name="delta_second">1フレームあたりの時間</param>
+void EnemyBase::EscapeMovement()
 {
 
 }

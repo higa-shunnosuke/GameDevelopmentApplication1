@@ -101,6 +101,7 @@ void Player::Draw(const Vector2D& screen_offset) const
 
 #if _DEBUG
 	DrawFormatString(10, 40, 0xffff00, "%2d,%2d", x,y);
+	DrawFormatString(10, 10, 0xffff00, "%d", GetFoodCount());
 #endif
 }
 
