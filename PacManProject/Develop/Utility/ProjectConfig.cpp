@@ -7,7 +7,7 @@ LONGLONG now_time;		// 現在計測値
 float delta_second;		// １フレームあたりの時間
 
 // フレーム時間計測
-void FreamControl()
+void FrameControl()
 {
 	// 現在時間の取得（μ秒）
 	now_time = GetNowHiPerformanceCount();

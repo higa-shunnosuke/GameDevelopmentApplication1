@@ -76,7 +76,7 @@ void SceneManager::Run()
 		
 
 		// フレームレートの制御
-		FreamControl();
+		FrameControl();
 
 		// シーンの更新
 		eSceneType next_scene_type = current_scene->Update(GetDeltaSecond());

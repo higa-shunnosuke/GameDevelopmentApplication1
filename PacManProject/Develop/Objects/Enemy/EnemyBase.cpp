@@ -1,10 +1,10 @@
 #include "EnemyBase.h"
 #include "../../Utility/ResourceManager.h"
 #include "DxLib.h"
-#include "Blinky.h"
-#include "Pinky.h"
-#include "Inky.h"
-#include "Clyde.h"
+#include "Ghost/Blinky.h"
+#include "Ghost/Pinky.h"
+#include "Ghost/Inky.h"
+#include "Ghost/Clyde.h"
 #include "../../Utility/InputManager.h"
 
 EnemyBase::EnemyBase():
@@ -13,7 +13,7 @@ EnemyBase::EnemyBase():
 	animation_time(0.0f),
 	animation_count(1),
 	time(0.0f),
-	flash_count(0),
+	flash_count(0),flash_flag(false),
 	enemy_type(eEnemyType::blinky),
 	velocity(0.0f),
 	enemy_state(eEnemyState::WAIT),
@@ -58,25 +58,27 @@ void EnemyBase::Update(float delta_second)
 	//パネルの確認
 	StageData::ConvertToIndex(location, y, x);
 
+	/// エネミー状態変更処理
+	ChangeState();
+
 	//移動処理
 	Movement(delta_second);
 
 	// アニメーション制御
 	AnimationControl(delta_second);
-
-	/// エネミー状態変更処理
-	ChangeState();
 }
 
 //更新処理
 void EnemyBase::Draw(const Vector2D& screen_offset) const
 {
+	//ぼでーの描画
 	if (enemy_state != eEnemyState::ESCAPE)
 	{
 		// 親クラスの描画処理を呼び出す
 		__super::Draw(screen_offset);
 	}
 
+	//目の描画
 	if (enemy_state != eEnemyState::FRIGHTENED)
 	{
 		// オフセット値を基に画像の描画を行う
@@ -190,6 +192,13 @@ void EnemyBase::SetType()
 		// レイヤーの設定
 		z_layer = 6;
 		break;
+	case 14:
+		//ピンキー
+		enemy_type = eEnemyType::pinky;
+		enemy = dynamic_cast<EnemyBase*>(new Pinky());
+		enemy->Initialize();
+		z_layer = 7;
+		break;
 	case 12:
 		//アオスケ
 		enemy_type = eEnemyType::inky;
@@ -204,13 +213,6 @@ void EnemyBase::SetType()
 		enemy->Initialize();
 		z_layer = 9;
 		break;
-	case 14:
-		//ピンキー
-		enemy_type = eEnemyType::pinky;
-		enemy = dynamic_cast<EnemyBase*>(new Pinky());
-		enemy->Initialize();
-		z_layer = 7;
-		break;
 	default:
 		break;
 	}
@@ -222,54 +224,62 @@ void EnemyBase::SetType()
 void EnemyBase::ChangeState()
 {	
 	//待機状態を解除する
-	switch (enemy_type)
+	if (enemy_state == eEnemyState::WAIT)
 	{
-	case EnemyBase::blinky:
-		break;
-	case EnemyBase::pinky:
-		break;
-	case EnemyBase::inky:
-		if (0 < player->GetFoodCount() - dot_counter)
+		switch (enemy_type)
 		{
-			dot_counter = player->GetFoodCount();
+		case EnemyBase::blinky:
+		case EnemyBase::pinky:
+			enemy_state = eEnemyState::SCATTER;
+			break;
+		case EnemyBase::inky:
+			if (0 < player->GetFoodCount() - dot_counter)
+			{
+				dot_counter = player->GetFoodCount();
 
-			if (dot_limit >= 29)
-			{
-				enemy_state = eEnemyState::SCATTER;
-				dot_limit = 0;
+				if (dot_limit >= 29)
+				{
+					enemy_state = eEnemyState::SCATTER;
+					dot_limit = 0;
+				}
+				else
+				{
+					dot_limit++;
+				}
 			}
-			else
+			break;
+		case EnemyBase::clyde:
+			if (0 < player->GetFoodCount() - dot_counter)
 			{
-				dot_limit++;
-			}
-		}
-		break;
-	case EnemyBase::clyde:
-		if (0 < player->GetFoodCount() - dot_counter)
-		{
-			dot_counter = player->GetFoodCount();
+				dot_counter = player->GetFoodCount();
 
-			if (dot_limit >= 30 + 59)
-			{
-				enemy_state = eEnemyState::SCATTER;
-				dot_limit = 0;
+				if (dot_limit >= 30 + 59)
+				{
+					enemy_state = eEnemyState::SCATTER;
+					dot_limit = 0;
+				}
+				else
+				{
+					dot_limit++;
+				}
 			}
-			else
-			{
-				dot_limit++;
-			}
+			break;
+		default:
+			break;
 		}
-		break;
-	default:
-		break;
 	}
 
-	
 	//いじけ状態にする
 	if (player->GetPowerUp() == true && enemy_state != eEnemyState::ESCAPE)
 	{
 		enemy_state = eEnemyState::FRIGHTENED;
 	}
+
+	//いじけ状態から回復する
+	/*if (flash_count > 5)
+	{
+		enemy_state = eEnemyState::SCATTER;
+	}*/
 }
 
 /// <summary>
@@ -286,9 +296,12 @@ void EnemyBase::TimeControl()
 /// <param name="delta_second">1フレームあたりの時間</param>
 void EnemyBase::AnimationControl(float delta_second)
 {
+	int count = 0;
+	int start;
+
 	// 移動中のアニメーション
 	animation_time += delta_second;
-	if (animation_time >= (0.1f))
+	if (animation_time >= (0.2f))
 	{
 		animation_time = 0.0f;
 		animation_count++;
@@ -297,14 +310,24 @@ void EnemyBase::AnimationControl(float delta_second)
 		{
 			animation_count = 0;
 		}
-		// 画像の設定
+
+		//点滅アニメーション
+		if (flash_flag == true)
+		{
+			if (animation_count == 1)
+			{
+				count = 2;
+			}
+		}
+
+		//画像の設定
 		//死んだときはアニメーションしない
 		if (enemy_state != eEnemyState::ESCAPE)
 		{
 			//いじけ状態のとき
 			if (enemy_state == eEnemyState::FRIGHTENED)
 			{
-				image = move_animation[16 + animation_count];
+				image = move_animation[16 + animation_count + count];
 			}
 			//いじけ状態ではないとき
 			else
@@ -312,7 +335,6 @@ void EnemyBase::AnimationControl(float delta_second)
 				image = move_animation[enemy_type * 2 + animation_count];
 			}
 		}
-	
 	}
 }
 
@@ -349,16 +371,18 @@ void EnemyBase::Movement(float delta_second)
 
 	if (input->GetKeyDown(KEY_INPUT_SPACE))
 	{
-		if (i < 4)
+		if (enemy_state == eEnemyState::FRIGHTENED)
 		{
-			i++;
-		}
-		else
-		{
-			i = 0;
+			if (flash_flag == false)
+			{
+				flash_flag = true;
+			}
+			else
+			{
+				flash_flag = false;
+			}
 		}
 	}
-
 
 	if (enemy_type == i)
 	{	

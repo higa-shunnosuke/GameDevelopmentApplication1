@@ -18,7 +18,7 @@
 /// <summary>
 /// フレーム制御
 /// </summary>
-void FreamControl();
+void FrameControl();
 
 /// <summary>
 /// 1フレーム当たりの時間を取得する

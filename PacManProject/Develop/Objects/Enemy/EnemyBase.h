@@ -41,6 +41,7 @@ private:
 	int					animation_count;	//アニメーション添え字
 	float				time;				//各状態の持ち時間
 	int					flash_count;		//点滅カウント用の変数
+	bool				flash_flag;			//点滅フラグ
 	eEnemyType			enemy_type;			//エネミーの種類
 	int					i;					//
 	EnemyBase*			enemy;				//エネミー情報
