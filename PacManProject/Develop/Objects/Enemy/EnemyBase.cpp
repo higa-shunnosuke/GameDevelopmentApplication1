@@ -296,12 +296,36 @@ void EnemyBase::TimeControl()
 /// <param name="delta_second">1フレームあたりの時間</param>
 void EnemyBase::AnimationControl(float delta_second)
 {
-	int count = 0;
-	int start;
+	// 入力状態の取得
+	InputManager* input = InputManager::GetInstance();
+
+	//点滅フラグ処理
+	if (input->GetKeyDown(KEY_INPUT_SPACE))
+	{
+		if (enemy_state == eEnemyState::FRIGHTENED)
+		{
+			if (flash_flag == false)
+			{
+				flash_flag = true;
+				if (image == move_animation[16])
+				{
+					count = 0;
+				}
+				else
+				{
+					count = 1;
+				}
+			}
+			else
+			{
+				flash_flag = false;
+			}
+		}
+	}
 
 	// 移動中のアニメーション
 	animation_time += delta_second;
-	if (animation_time >= (0.2f))
+	if (animation_time >= (0.4f))
 	{
 		animation_time = 0.0f;
 		animation_count++;
@@ -311,15 +335,6 @@ void EnemyBase::AnimationControl(float delta_second)
 			animation_count = 0;
 		}
 
-		//点滅アニメーション
-		if (flash_flag == true)
-		{
-			if (animation_count == 1)
-			{
-				count = 2;
-			}
-		}
-
 		//画像の設定
 		//死んだときはアニメーションしない
 		if (enemy_state != eEnemyState::ESCAPE)
@@ -327,7 +342,37 @@ void EnemyBase::AnimationControl(float delta_second)
 			//いじけ状態のとき
 			if (enemy_state == eEnemyState::FRIGHTENED)
 			{
-				image = move_animation[16 + animation_count + count];
+				//点滅アニメーション
+				if (flash_flag == true)
+				{
+					if (count == 0)
+					{
+						if (animation_count == 1)
+						{
+							image = move_animation[16 + animation_count + 2];
+						}
+						else
+						{
+							image = move_animation[16 + animation_count];
+						}
+					}
+					else
+					{
+						if (animation_count == 1)
+						{
+							image = move_animation[16 + animation_count];
+						}
+						else
+						{
+							image = move_animation[16 + animation_count + 2];
+						}
+					}
+				}
+				//いじけアニメーション
+				else
+				{
+					image = move_animation[16 + animation_count];
+				}
 			}
 			//いじけ状態ではないとき
 			else
@@ -368,21 +413,6 @@ void EnemyBase::Movement(float delta_second)
 
 	// 入力状態の取得
 	InputManager* input = InputManager::GetInstance();
-
-	if (input->GetKeyDown(KEY_INPUT_SPACE))
-	{
-		if (enemy_state == eEnemyState::FRIGHTENED)
-		{
-			if (flash_flag == false)
-			{
-				flash_flag = true;
-			}
-			else
-			{
-				flash_flag = false;
-			}
-		}
-	}
 
 	if (enemy_type == i)
 	{	
