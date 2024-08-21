@@ -216,6 +216,9 @@ void EnemyBase::SetType()
 	default:
 		break;
 	}
+
+	//初期画像設定
+	image = move_animation[enemy_type * 2];
 }
 
 /// <summary>
@@ -272,14 +275,41 @@ void EnemyBase::ChangeState()
 	//いじけ状態にする
 	if (player->GetPowerUp() == true && enemy_state != eEnemyState::ESCAPE)
 	{
+		if (enemy_state != eEnemyState::FRIGHTENED)
+		{
+			image = move_animation[16];
+		}
 		enemy_state = eEnemyState::FRIGHTENED;
 	}
 
-	//いじけ状態から回復する
-	/*if (flash_count > 5)
+	// 入力状態の取得
+	InputManager* input = InputManager::GetInstance();
+
+	//点滅フラグ処理
+	if (input->GetKeyDown(KEY_INPUT_SPACE))
 	{
+		if (enemy_state == eEnemyState::FRIGHTENED)
+		{
+			if (flash_flag == false)
+			{
+				flash_flag = true;
+			}
+			else
+			{
+				flash_flag = false;
+			}
+		}
+	}
+
+	//いじけ状態から回復する
+	if (flash_count > 5)
+	{
+		image = move_animation[enemy_type * 2];
 		enemy_state = eEnemyState::SCATTER;
-	}*/
+		player->SetPowerDown();
+		flash_flag = false;
+		flash_count = 0;
+	}
 }
 
 /// <summary>
@@ -296,33 +326,6 @@ void EnemyBase::TimeControl()
 /// <param name="delta_second">1フレームあたりの時間</param>
 void EnemyBase::AnimationControl(float delta_second)
 {
-	// 入力状態の取得
-	InputManager* input = InputManager::GetInstance();
-
-	//点滅フラグ処理
-	if (input->GetKeyDown(KEY_INPUT_SPACE))
-	{
-		if (enemy_state == eEnemyState::FRIGHTENED)
-		{
-			if (flash_flag == false)
-			{
-				flash_flag = true;
-				if (image == move_animation[16])
-				{
-					count = 0;
-				}
-				else
-				{
-					count = 1;
-				}
-			}
-			else
-			{
-				flash_flag = false;
-			}
-		}
-	}
-
 	// 移動中のアニメーション
 	animation_time += delta_second;
 	if (animation_time >= (0.4f))
@@ -345,27 +348,23 @@ void EnemyBase::AnimationControl(float delta_second)
 				//点滅アニメーション
 				if (flash_flag == true)
 				{
-					if (count == 0)
+					if (image == move_animation[16])
 					{
-						if (animation_count == 1)
-						{
-							image = move_animation[16 + animation_count + 2];
-						}
-						else
-						{
-							image = move_animation[16 + animation_count];
-						}
+						image = move_animation[19];
+						flash_count++;
 					}
-					else
+					else if (image == move_animation[19])
 					{
-						if (animation_count == 1)
-						{
-							image = move_animation[16 + animation_count];
-						}
-						else
-						{
-							image = move_animation[16 + animation_count + 2];
-						}
+						image = move_animation[16];
+					}
+					else if (image == move_animation[17])
+					{
+						image = move_animation[18];
+						flash_count++;
+					}
+					else if (image == move_animation[18])
+					{
+						image = move_animation[17];
 					}
 				}
 				//いじけアニメーション

@@ -48,7 +48,7 @@ private:
 	int					x, y;				//パネル保存用の変数
 	int					dot_counter;		//ドットカウンター
 	int					dot_limit;			//ドット制限
-	int count = 0;
+	
 
 protected:
 	Vector2D			velocity;			//移動量
