@@ -13,17 +13,19 @@ EnemyBase::EnemyBase():
 	animation_time(0.0f),
 	animation_count(1),
 	time(0.0f),
-	flash_count(0),flash_flag(false),
+	flash_count(0),is_flash(false),
 	enemy_type(eEnemyType::blinky),
 	velocity(0.0f),
 	enemy_state(eEnemyState::WAIT),
-	direction_state(eDirectionState::LEFT),
+	direction_state(eDirectionState::DOWN),
 	player(nullptr),
 	i(0),
 	enemy(nullptr),
 	x(0),y(0),
+	go_x(0),go_y(0),
 	dot_counter(0),
-	dot_limit(0)
+	dot_limit(0),
+	is_speed_down(false)
 {
 
 }
@@ -114,49 +116,6 @@ void EnemyBase::Finalize()
 }
 
 /// <summary>
-/// 当たり判定通知処理
-/// </summary>
-/// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
-void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
-{
-	/*if (enemy_state != eEnemyState::WAIT && enemy_state != eEnemyState::ESCAPE)
-	{*/
-		// 当たった、オブジェクトが壁だったら
-		if (hit_object->GetCollision().object_type == eObjectType::wall)
-		{
-			// 当たり判定情報を取得して、カプセルがある位置を求める
-			CapsuleCollision hc = hit_object->GetCollision();
-			hc.point[0] += hit_object->GetLocation();
-			hc.point[1] += hit_object->GetLocation();
-
-			// 最近傍点を求める
-			Vector2D near_point = NearPointCheck(hc, this->location);
-
-			//Enemyからnear_pointへの方向ベクトルを取得
-			Vector2D dv2 = near_point - this->location;
-			Vector2D dv = this->location - near_point;
-
-			// めり込んだ差分
-			float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
-
-			// diffの分だけ戻る
-			location += dv.Normalize() * diff;
-		}
-	/*}*/
-
-	//いじけ状態のとき
-	if (enemy_state == eEnemyState::FRIGHTENED)
-	{
-		// 当たったオブジェクトがプレイヤーだったら
-		if (hit_object->GetCollision().object_type == eObjectType::player)
-		{
-			enemy_state = eEnemyState::ESCAPE;
-		}
-	}
-	
-}
-
-/// <summary>
 /// エネミーの状態を取得する
 /// </summary>
 /// <returns>エネミーの状態</returns>
@@ -232,8 +191,13 @@ void EnemyBase::ChangeState()
 		switch (enemy_type)
 		{
 		case EnemyBase::blinky:
-		case EnemyBase::pinky:
 			enemy_state = eEnemyState::SCATTER;
+			break;
+		case EnemyBase::pinky:
+			if (dot_limit >= 0)
+			{
+				SetDestination();
+			}
 			break;
 		case EnemyBase::inky:
 			if (0 < player->GetFoodCount() - dot_counter)
@@ -242,7 +206,7 @@ void EnemyBase::ChangeState()
 
 				if (dot_limit >= 29)
 				{
-					enemy_state = eEnemyState::SCATTER;
+					SetDestination();
 					dot_limit = 0;
 				}
 				else
@@ -258,7 +222,7 @@ void EnemyBase::ChangeState()
 
 				if (dot_limit >= 30 + 59)
 				{
-					enemy_state = eEnemyState::SCATTER;
+					SetDestination();
 					dot_limit = 0;
 				}
 				else
@@ -290,13 +254,13 @@ void EnemyBase::ChangeState()
 	{
 		if (enemy_state == eEnemyState::FRIGHTENED)
 		{
-			if (flash_flag == false)
+			if (is_flash == false)
 			{
-				flash_flag = true;
+				is_flash = true;
 			}
 			else
 			{
-				flash_flag = false;
+				is_flash = false;
 			}
 		}
 	}
@@ -307,8 +271,271 @@ void EnemyBase::ChangeState()
 		image = move_animation[enemy_type * 2];
 		enemy_state = eEnemyState::SCATTER;
 		player->SetPowerDown();
-		flash_flag = false;
+		is_flash = false;
 		flash_count = 0;
+	}
+}
+
+/// <summary>
+/// 当たり判定通知処理
+/// </summary>
+/// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
+void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
+{
+	if (enemy_state != eEnemyState::ESCAPE)
+	{
+		// 当たった、オブジェクトが壁だったら
+		if (hit_object->GetCollision().object_type == eObjectType::wall)
+		{
+			if (enemy_state != eEnemyState::WAIT)
+			{
+				// 当たり判定情報を取得して、カプセルがある位置を求める
+				CapsuleCollision hc = hit_object->GetCollision();
+				hc.point[0] += hit_object->GetLocation();
+				hc.point[1] += hit_object->GetLocation();
+
+				// 最近傍点を求める
+				Vector2D near_point = NearPointCheck(hc, this->location);
+
+				//Enemyからnear_pointへの方向ベクトルを取得
+				Vector2D dv2 = near_point - this->location;
+				Vector2D dv = this->location - near_point;
+
+				// めり込んだ差分
+				float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
+
+				// diffの分だけ戻る
+				location += dv.Normalize() * diff;
+			}
+			else
+			{
+				if (is_speed_down != true)
+				{
+					if (direction_state == eDirectionState::UP)
+					{
+						direction_state = eDirectionState::DOWN;
+					}
+					else if (direction_state == eDirectionState::DOWN)
+					{
+						direction_state = eDirectionState::UP;
+					}
+				}
+			}
+		}
+	}
+
+	//いじけ状態のとき
+	if (enemy_state == eEnemyState::FRIGHTENED)
+	{
+		// 当たったオブジェクトがプレイヤーだったら
+		if (hit_object->GetCollision().object_type == eObjectType::player)
+		{
+			enemy_state = eEnemyState::ESCAPE;
+		}
+	}
+
+}
+
+/// <summary>
+/// 移動量設定処理
+/// </summary>
+float EnemyBase::SetVelocity()
+{
+	float ret;
+
+	if (is_speed_down == true)
+	{
+		ret = 1.0f * 0.7f;
+	}
+	else
+	{
+		ret = 1.0f;
+	}
+
+	return ret;
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+/// <param name="delta_second">1フレームあたりの時間</param>
+void EnemyBase::Movement(float delta_second)
+{
+	// エネミー状態によって、動作を変える
+	switch (enemy_state)
+	{
+	case WAIT:
+		WaitMovement();
+		break;
+	case SCATTER:
+		ScatterMovement();
+		break;
+	case CHASE:
+		TrackingMovement();
+		break;
+	case FRIGHTENED:
+		ScaredMovement();
+		break;
+	case ESCAPE:
+		EscapeMovement();
+		break;
+	default:
+		break;
+	}
+
+	// 入力状態の取得
+	InputManager* input = InputManager::GetInstance();
+
+	if (enemy_type == i)
+	{	
+		if (input->GetKeyDown(KEY_INPUT_W))
+		{
+			direction_state = eDirectionState::UP;
+		}
+		else if (input->GetKeyDown(KEY_INPUT_S))
+		{
+			direction_state = eDirectionState::DOWN;
+		}
+		else if (input->GetKeyDown(KEY_INPUT_A))
+		{
+			direction_state = eDirectionState::LEFT;
+		}
+		else if (input->GetKeyDown(KEY_INPUT_D))
+		{
+			direction_state = eDirectionState::RIGHT;
+		}
+	}
+
+	// 進行方向の移動量を追加
+	switch (direction_state)
+	{
+	case eDirectionState::UP:
+		velocity.x = 0.0f;
+		velocity.y = -SetVelocity();
+		break;
+	case eDirectionState::DOWN:
+		velocity.x = 0.0f;
+		velocity.y = SetVelocity();
+		break;
+	case eDirectionState::LEFT:
+		velocity.x = -SetVelocity();
+		velocity.y = 0.0f;
+		break;
+	case eDirectionState::RIGHT:
+		velocity.x = SetVelocity();
+		velocity.y = 0.0f;
+		break;
+	}
+
+	// 移動量 * 速さ * 時間 で移動先を決定する
+	location += velocity * 50.0f * delta_second;
+
+	// 画面外に行ったら、反対側にワープさせる
+	if (location.x < 0.0f)
+	{
+		location.x = 672.0f - collision.radius;
+		velocity.y = 0.0f;
+	}
+	if (672.0f < location.x)
+	{
+		location.x = collision.radius;
+		velocity.y = 0.0f;
+	}
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+void EnemyBase::WaitMovement()
+{
+	//目的地が決まっていないとき
+	if (go_x == 0 && go_y == 0)
+	{
+		//待機処理
+	}
+	//出口に向かうとき
+	else
+	{
+		//横方向処理
+		if (go_x - x > 0)
+		{
+			direction_state = eDirectionState::RIGHT;
+		}
+		else if (go_x - x < 0)
+		{
+			direction_state = eDirectionState::LEFT;
+		}
+		else
+		{
+			//縦方向処理
+			if (go_y - y < 0)
+			{
+				direction_state = eDirectionState::UP;
+				//減速させる
+				is_speed_down = true;
+			}
+			else
+			{
+				is_speed_down = false;
+				enemy_state = eEnemyState::SCATTER;
+			}
+		}
+	}
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+void EnemyBase::ScatterMovement()
+{
+	direction_state = eDirectionState::LEFT;
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+void EnemyBase::TrackingMovement()
+{
+
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+void EnemyBase::ScaredMovement()
+{
+
+}
+
+/// <summary>
+/// 移動処理
+/// </summary>
+void EnemyBase::EscapeMovement()
+{
+
+}
+
+/// <summary>
+/// 目標設定処理
+/// </summary>
+void EnemyBase::SetDestination()
+{
+	switch (enemy_state)
+	{
+	case WAIT:
+		go_x = 14;
+		go_y = 11;
+		break;
+	case SCATTER:
+		break;
+	case CHASE:
+		break;
+	case FRIGHTENED:
+		break;
+	case ESCAPE:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -346,7 +573,7 @@ void EnemyBase::AnimationControl(float delta_second)
 			if (enemy_state == eEnemyState::FRIGHTENED)
 			{
 				//点滅アニメーション
-				if (flash_flag == true)
+				if (is_flash == true)
 				{
 					if (image == move_animation[16])
 					{
@@ -380,146 +607,4 @@ void EnemyBase::AnimationControl(float delta_second)
 			}
 		}
 	}
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::Movement(float delta_second)
-{
-	// エネミー状態によって、動作を変える
-	switch (enemy_state)
-	{
-	case WAIT:
-		WaitMovement();
-		break;
-	case SCATTER:
-		TerritoryMovement();
-		break;
-	case CHASE:
-		TrackingMovement();
-		break;
-	case FRIGHTENED:
-		ScaredMovement();
-		break;
-	case ESCAPE:
-		EscapeMovement();
-		break;
-	default:
-		break;
-	}
-
-	// 入力状態の取得
-	InputManager* input = InputManager::GetInstance();
-
-	if (enemy_type == i)
-	{	
-		if (input->GetKeyDown(KEY_INPUT_W))
-		{
-			direction_state = eDirectionState::UP;
-		}
-		else if (input->GetKeyDown(KEY_INPUT_S))
-		{
-			direction_state = eDirectionState::DOWN;
-		}
-		else if (input->GetKeyDown(KEY_INPUT_A))
-		{
-			direction_state = eDirectionState::LEFT;
-		}
-		else if (input->GetKeyDown(KEY_INPUT_D))
-		{
-			direction_state = eDirectionState::RIGHT;
-		}
-
-		// 進行方向の移動量を追加
-		switch (direction_state)
-		{
-		case eDirectionState::UP:
-			velocity.y = -1.0f;
-			velocity.x = 0.0f;
-			break;
-		case eDirectionState::DOWN:
-			velocity.y = 1.0f;
-			velocity.x = 0.0f;
-			break;
-		case eDirectionState::LEFT:
-			velocity.x = -1.0f;
-			velocity.y = 0.0f;
-			break;
-		case eDirectionState::RIGHT:
-			velocity.x = 1.0f;
-			velocity.y = 0.0f;
-			break;
-		}
-
-		// 移動量 * 速さ * 時間 で移動先を決定する
-		location += velocity * 50.0f * delta_second;
-
-		// 画面外に行ったら、反対側にワープさせる
-		if (location.x < 0.0f)
-		{
-			location.x = 672.0f - collision.radius;
-			velocity.y = 0.0f;
-		}
-		if (672.0f < location.x)
-		{
-			location.x = collision.radius;
-			velocity.y = 0.0f;
-		}
-	}
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::WaitMovement()
-{
-
-
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::TerritoryMovement()
-{
-
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::TrackingMovement()
-{
-
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::ScaredMovement()
-{
-
-}
-
-/// <summary>
-/// 移動処理
-/// </summary>
-/// <param name="delta_second">1フレームあたりの時間</param>
-void EnemyBase::EscapeMovement()
-{
-
-}
-
-/// <summary>
-/// 目標設定処理
-/// </summary>
-void EnemyBase::SetDestination()
-{
-
 }

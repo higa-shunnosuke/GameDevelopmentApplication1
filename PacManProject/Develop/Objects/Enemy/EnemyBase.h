@@ -41,13 +41,15 @@ private:
 	int					animation_count;	//アニメーション添え字
 	float				time;				//各状態の持ち時間
 	int					flash_count;		//点滅カウント用の変数
-	bool				flash_flag;			//点滅フラグ
+	bool				is_flash;			//点滅フラグ
 	eEnemyType			enemy_type;			//エネミーの種類
-	int					i;					//
+	int					i;					//操作キャラ
 	EnemyBase*			enemy;				//エネミー情報
 	int					x, y;				//パネル保存用の変数
+	int					go_x,go_y;			//目的地のパネル保存用変数
 	int					dot_counter;		//ドットカウンター
 	int					dot_limit;			//ドット制限
+	bool				is_speed_down;		//減速フラグ
 	
 
 protected:
@@ -113,6 +115,11 @@ private:
 	void AnimationControl(float delta_second);
 
 	/// <summary>
+	/// 移動量設定処理
+	/// </summary>
+	float SetVelocity();
+
+	/// <summary>
 	/// 移動処理
 	/// </summary>
 	/// <param name="delta_second">1フレームあたりの時間</param>
@@ -126,7 +133,7 @@ private:
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	void TerritoryMovement();
+	void ScatterMovement();
 
 	/// <summary>
 	/// 移動処理
