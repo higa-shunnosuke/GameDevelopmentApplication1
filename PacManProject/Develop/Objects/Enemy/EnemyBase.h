@@ -35,8 +35,9 @@ private:
 		LEFT
 	};
 private:
-	std::vector<int>	move_animation;		//体のアニメーション画像
-	std::vector<int>	eyes_animation;		//目のアニメーション画像
+	std::map<eAdjacentDirection, ePanelID> adjacent_panel;	//隣接するパネルのデータ
+	std::vector<int>	move_animation;						//体のアニメーション画像
+	std::vector<int>	eyes_animation;						//目のアニメーション画像
 	float				animation_time;		//アニメーション時間
 	int					animation_count;	//アニメーション添え字
 	float				time;				//各状態の持ち時間

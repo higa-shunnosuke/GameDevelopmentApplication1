@@ -8,6 +8,7 @@
 #include "../../Utility/InputManager.h"
 
 EnemyBase::EnemyBase():
+	adjacent_panel(),
 	move_animation(),
 	eyes_animation(),
 	animation_time(0.0f),
@@ -38,6 +39,8 @@ EnemyBase::~EnemyBase()
 //初期化処理
 void EnemyBase::Initialize()
 {
+	//ステージデータの読み込み
+
 	// アニメーション画像の読み込み
 	ResourceManager* rm = ResourceManager::GetInstance();
 	move_animation = rm->GetImages("Resource/Images/monster.png", 20, 20, 1, 32, 32);
@@ -498,6 +501,7 @@ void EnemyBase::WaitMovement()
 	if (go_x == 0 && go_y == 0)
 	{
 		//待機処理
+		
 	}
 	//出口に向かうとき
 	else
