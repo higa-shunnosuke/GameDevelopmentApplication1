@@ -120,6 +120,11 @@ private:
 	float SetVelocity();
 
 	/// <summary>
+	/// 方向設定処理
+	/// </summary>
+	void SetDirection();
+
+	/// <summary>
 	/// 移動処理
 	/// </summary>
 	/// <param name="delta_second">1フレームあたりの時間</param>
