@@ -52,6 +52,9 @@ void EnemyBase::Initialize()
 
 	// 可動性の設定
 	mobility = eMobilityType::Movable;
+
+	//初期進行方向の設定
+	SetDirection(eDirectionState::UP);
 }
 
 //更新処理
@@ -62,9 +65,6 @@ void EnemyBase::Update(float delta_second)
 
 	//エネミー状態変更処理
 	ChangeState();
-
-	//方向設定処理
-	SetDirection();
 
 	//移動処理
 	Movement(delta_second);
@@ -96,9 +96,9 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	switch (enemy_type)
 	{
 	case EnemyBase::blinky:
-		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%f,%f", x,y,location.y,location.x);
+		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y, enemy_state);
 		break;
-	/*case EnemyBase::pinky:
+	case EnemyBase::pinky:
 		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, enemy_state);
 		break;
 	case EnemyBase::inky:
@@ -106,7 +106,7 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 		break;
 	case EnemyBase::clyde:
 		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, enemy_state);
-		break;*/
+		break;
 	}
 #endif
 }
@@ -292,23 +292,23 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 		{
 			if (enemy_state != eEnemyState::WAIT /*&& enemy_state != eEnemyState::FRIGHTENED*/)
 			{
-				//// 当たり判定情報を取得して、カプセルがある位置を求める
-				//CapsuleCollision hc = hit_object->GetCollision();
-				//hc.point[0] += hit_object->GetLocation();
-				//hc.point[1] += hit_object->GetLocation();
+				// 当たり判定情報を取得して、カプセルがある位置を求める
+				CapsuleCollision hc = hit_object->GetCollision();
+				hc.point[0] += hit_object->GetLocation();
+				hc.point[1] += hit_object->GetLocation();
 
-				//// 最近傍点を求める
-				//Vector2D near_point = NearPointCheck(hc, this->location);
+				// 最近傍点を求める
+				Vector2D near_point = NearPointCheck(hc, this->location);
 
-				////Enemyからnear_pointへの方向ベクトルを取得
-				//Vector2D dv2 = near_point - this->location;
-				//Vector2D dv = this->location - near_point;
+				//Enemyからnear_pointへの方向ベクトルを取得
+				Vector2D dv2 = near_point - this->location;
+				Vector2D dv = this->location - near_point;
 
-				//// めり込んだ差分
-				//float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
+				// めり込んだ差分
+				float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
 
-				//// diffの分だけ戻る
-				//location += dv.Normalize() * diff;
+				// diffの分だけ戻る
+				location += dv.Normalize() * diff;
 			}
 			else
 			{
@@ -316,11 +316,11 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 				{
 					if (direction_state == eDirectionState::UP)
 					{
-						direction_state = eDirectionState::DOWN;
+						SetDirection(eDirectionState::DOWN);
 					}
 					else if (direction_state == eDirectionState::DOWN)
 					{
-						direction_state = eDirectionState::UP;
+						SetDirection(eDirectionState::UP);
 					}
 				}
 			}
@@ -361,7 +361,7 @@ float EnemyBase::SetVelocity()
 /// <summary>
 /// 方向設定処理
 /// </summary>
-void EnemyBase::SetDirection()
+void EnemyBase::SetDirection(eDirectionState direction)
 {
 	//現在の座標（int）
 	int ly = (int)location.y;
@@ -371,45 +371,34 @@ void EnemyBase::SetDirection()
 	int py = (int)((y + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f);
 	int px = (int)((x + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f);
 
-	// 入力状態の取得
-	InputManager* input = InputManager::GetInstance();
-
-	if (enemy_type == i)
+	switch (direction)
 	{
-		if (input->GetKey(KEY_INPUT_W))
+	case EnemyBase::UP:
+		if (lx == px)
 		{
-			if (lx == px)
-			{
-				direction_state = eDirectionState::UP;
-			}
+			direction_state = eDirectionState::UP;
 		}
-		else if (input->GetKey(KEY_INPUT_S))
+		break;
+	case EnemyBase::RIGHT:
+		if (ly == py)
 		{
-			if (lx == px)
-			{
-				direction_state = eDirectionState::DOWN;
-			}
+			direction_state = eDirectionState::RIGHT;
 		}
-		else if (input->GetKey(KEY_INPUT_A))
+		break;
+	case EnemyBase::DOWN:
+		if (lx == px)
 		{
-			if (ly == py)
-			{
-				direction_state = eDirectionState::LEFT;
-			}
+			direction_state = eDirectionState::DOWN;
 		}
-		else if (input->GetKey(KEY_INPUT_D))
+		break;
+	case EnemyBase::LEFT:
+		if (ly == py)
 		{
-			if (ly == py)
-			{
-				direction_state = eDirectionState::RIGHT;
-			}
+			direction_state = eDirectionState::LEFT;
 		}
-	}
-
-	//直角に曲がるようにする
-	if (location.x == (x + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f)
-	{
-
+		break;
+	default:
+		break;
 	}
 
 	// 進行方向の移動量を追加
@@ -462,6 +451,28 @@ void EnemyBase::Movement(float delta_second)
 		break;
 	}
 
+	// 入力状態の取得
+	InputManager* input = InputManager::GetInstance();
+
+	if (enemy_type == i)
+	{
+		if (input->GetKey(KEY_INPUT_W))
+		{
+			SetDirection(eDirectionState::UP);
+		}
+		else if (input->GetKey(KEY_INPUT_S))
+		{
+			SetDirection(eDirectionState::DOWN);
+		}
+		else if (input->GetKey(KEY_INPUT_A))
+		{
+			SetDirection(eDirectionState::LEFT);
+		}
+		else if (input->GetKey(KEY_INPUT_D))
+		{
+			SetDirection(eDirectionState::RIGHT);
+		}
+	}
 	// 移動量 * 速さ * 時間 で移動先を決定する
 	location += velocity * 50.0f * delta_second;
 
@@ -494,18 +505,18 @@ void EnemyBase::WaitMovement()
 		//横方向処理
 		if (go_x - x > 0)
 		{
-			direction_state = eDirectionState::RIGHT;
+			SetDirection(eDirectionState::RIGHT);
 		}
 		else if (go_x - x < 0)
 		{
-			direction_state = eDirectionState::LEFT;
+			SetDirection(eDirectionState::LEFT);
 		}
 		else
 		{
 			//縦方向処理
 			if (go_y - y < 0)
 			{
-				direction_state = eDirectionState::UP;
+				SetDirection(eDirectionState::UP);
 				//減速させる
 				is_speed_down = true;
 			}

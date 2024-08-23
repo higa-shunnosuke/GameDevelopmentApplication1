@@ -122,7 +122,8 @@ private:
 	/// <summary>
 	/// 方向設定処理
 	/// </summary>
-	void SetDirection();
+	/// <param name="direction">進行方向</param>
+	void SetDirection(eDirectionState direction);
 
 	/// <summary>
 	/// 移動処理
