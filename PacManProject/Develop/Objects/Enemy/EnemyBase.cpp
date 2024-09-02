@@ -122,12 +122,6 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 		break;
 	}
 
-	//目標パネルの描画
-	if (enemy_state != eEnemyState::FRIGHTENED)
-	{
-		
-		
-	}
 #endif
 }
 
@@ -424,6 +418,12 @@ void EnemyBase::SetDirection(eDirectionState direction)
 /// <param name="delta_second">1フレームあたりの時間</param>
 void EnemyBase::Movement(float delta_second)
 {
+	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
+	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
+	int x[4], y[4];					//隣接するパネルの添え字保存用変数
+	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
+	eDirectionState next_direction;	//次に進む方向
+
 	// エネミー状態によって、動作を変える
 	switch (enemy_state)
 	{
@@ -445,35 +445,6 @@ void EnemyBase::Movement(float delta_second)
 	default:
 		break;
 	}
-
-	// 入力状態の取得
-	InputManager* input = InputManager::GetInstance();
-
-	if (enemy_type == i)
-	{
-		if (input->GetKey(KEY_INPUT_W))
-		{
-			SetDirection(eDirectionState::UP);
-		}
-		else if (input->GetKey(KEY_INPUT_S))
-		{
-			SetDirection(eDirectionState::DOWN);
-		}
-		else if (input->GetKey(KEY_INPUT_A))
-		{
-			SetDirection(eDirectionState::LEFT);
-		}
-		else if (input->GetKey(KEY_INPUT_D))
-		{
-			SetDirection(eDirectionState::RIGHT);
-		}
-	}
-
-	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
-	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
-	int x[4], y[4];					//隣接するパネルの添え字保存用変数
-	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
-	eDirectionState next_direction;	//次に進む方向
 
 	//後ろの方向を設定
 	switch (direction_state)
@@ -653,7 +624,6 @@ void EnemyBase::ScatterMovement()
 {
 	//縄張りを設定
 	SetDestination();
-	
 }
 
 /// <summary>
@@ -661,7 +631,8 @@ void EnemyBase::ScatterMovement()
 /// </summary>
 void EnemyBase::TrackingMovement()
 {
-
+	//各エネミーの追跡処理
+	enemy->TrackingMovement();
 }
 
 /// <summary>
@@ -711,8 +682,6 @@ void EnemyBase::SetDestination()
 			go_y = 30;
 			break;
 		}
-		break;
-	case CHASE:
 		break;
 	case ESCAPE:
 		break;
