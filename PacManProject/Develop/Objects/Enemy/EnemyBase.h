@@ -27,15 +27,16 @@ private:
 	};
 
 	//進行方向状態
-	enum eDirectionState
+	enum eDirectionState : unsigned char
 	{
-		UP,
+		UP = 0,
 		RIGHT,
 		DOWN,
 		LEFT
 	};
 private:
 	std::map<eAdjacentDirection, ePanelID> adjacent_panel;	//隣接するパネルのデータ
+	unsigned char		now_panel;							//現在のパネルデータ
 	std::vector<int>	move_animation;						//体のアニメーション画像
 	std::vector<int>	eyes_animation;						//目のアニメーション画像
 	float				animation_time;		//アニメーション時間
@@ -44,7 +45,7 @@ private:
 	int					flash_count;		//点滅カウント用の変数
 	bool				is_flash;			//点滅フラグ
 	eEnemyType			enemy_type;			//エネミーの種類
-	int					i;					//操作キャラ
+	int					i;					//操作キャラ変更用変数
 	EnemyBase*			enemy;				//エネミー情報
 	int					x, y;				//パネル保存用の変数
 	int					go_x,go_y;			//目的地のパネル保存用変数

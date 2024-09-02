@@ -9,6 +9,7 @@
 
 EnemyBase::EnemyBase():
 	adjacent_panel(),
+	now_panel(),
 	move_animation(),
 	eyes_animation(),
 	animation_time(0.0f),
@@ -23,7 +24,7 @@ EnemyBase::EnemyBase():
 	i(0),
 	enemy(nullptr),
 	x(0),y(0),
-	go_x(0),go_y(0),
+	go_x(-1),go_y(-1),
 	dot_counter(0),
 	dot_limit(0),
 	is_speed_down(false)
@@ -96,20 +97,36 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	
 #if _DEBUG
 
+	//目標パネルの座標
+	int py = (int)((go_y + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f + D_OBJECT_SIZE * 3.0f);
+	int px = (int)((go_x + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f);
+
+	//現在パネルと状態と目標パネルの描画
 	switch (enemy_type)
 	{
 	case EnemyBase::blinky:
 		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y, enemy_state);
+		DrawCircle(px, py, 10, 0xff0000, TRUE);
 		break;
 	case EnemyBase::pinky:
 		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, enemy_state);
+		DrawCircle(px, py, 10, 0xffa0ff, TRUE);
 		break;
 	case EnemyBase::inky:
 		DrawFormatString(390, 40, 0x00ffff, "%2d,%2d,%d", x,y, enemy_state);
+		DrawCircle(px, py, 10, 0x00ffff, TRUE);
 		break;
 	case EnemyBase::clyde:
 		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, enemy_state);
+		DrawCircle(px, py, 10, 0xffa000, TRUE);
 		break;
+	}
+
+	//目標パネルの描画
+	if (enemy_state != eEnemyState::FRIGHTENED)
+	{
+		
+		
 	}
 #endif
 }
@@ -198,6 +215,7 @@ void EnemyBase::ChangeState()
 		{
 		case EnemyBase::blinky:
 			enemy_state = eEnemyState::SCATTER;
+			SetDirection(eDirectionState::LEFT);
 			break;
 		case EnemyBase::pinky:
 			if (dot_limit >= 0)
@@ -272,7 +290,7 @@ void EnemyBase::ChangeState()
 	}
 
 	//いじけ状態から回復する
-	if (flash_count > 5)
+	if (flash_count > 7)
 	{
 		image = move_animation[enemy_type * 2];
 		enemy_state = eEnemyState::SCATTER;
@@ -295,37 +313,23 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 		{
 			if (enemy_state != eEnemyState::WAIT /*&& enemy_state != eEnemyState::FRIGHTENED*/)
 			{
-				// 当たり判定情報を取得して、カプセルがある位置を求める
-				CapsuleCollision hc = hit_object->GetCollision();
-				hc.point[0] += hit_object->GetLocation();
-				hc.point[1] += hit_object->GetLocation();
+				//// 当たり判定情報を取得して、カプセルがある位置を求める
+				//CapsuleCollision hc = hit_object->GetCollision();
+				//hc.point[0] += hit_object->GetLocation();
+				//hc.point[1] += hit_object->GetLocation();
 
-				// 最近傍点を求める
-				Vector2D near_point = NearPointCheck(hc, this->location);
+				//// 最近傍点を求める
+				//Vector2D near_point = NearPointCheck(hc, this->location);
 
-				//Enemyからnear_pointへの方向ベクトルを取得
-				Vector2D dv2 = near_point - this->location;
-				Vector2D dv = this->location - near_point;
+				////Enemyからnear_pointへの方向ベクトルを取得
+				//Vector2D dv2 = near_point - this->location;
+				//Vector2D dv = this->location - near_point;
 
-				// めり込んだ差分
-				float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
+				//// めり込んだ差分
+				//float diff = (this->GetCollision().radius + hc.radius) - dv.Length();
 
-				// diffの分だけ戻る
-				location += dv.Normalize() * diff;
-			}
-			else
-			{
-				if (is_speed_down != true)
-				{
-					if (direction_state == eDirectionState::UP)
-					{
-						SetDirection(eDirectionState::DOWN);
-					}
-					else if (direction_state == eDirectionState::DOWN)
-					{
-						SetDirection(eDirectionState::UP);
-					}
-				}
+				//// diffの分だけ戻る
+				//location += dv.Normalize() * diff;
 			}
 		}
 	}
@@ -374,54 +378,42 @@ void EnemyBase::SetDirection(eDirectionState direction)
 	int py = (int)((y + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f);
 	int px = (int)((x + 1) * D_OBJECT_SIZE - D_OBJECT_SIZE / 2.0f);
 
+	//直角に曲がる処理
 	switch (direction)
 	{
 	case EnemyBase::UP:
 		if (lx == px)
 		{
 			direction_state = eDirectionState::UP;
+			velocity.x = 0.0f;
+			velocity.y = -SetVelocity();
 		}
 		break;
 	case EnemyBase::RIGHT:
 		if (ly == py)
 		{
 			direction_state = eDirectionState::RIGHT;
+			velocity.x = SetVelocity();
+			velocity.y = 0.0f;
 		}
 		break;
 	case EnemyBase::DOWN:
 		if (lx == px)
 		{
 			direction_state = eDirectionState::DOWN;
+			velocity.x = 0.0f;
+			velocity.y = SetVelocity();
 		}
 		break;
 	case EnemyBase::LEFT:
 		if (ly == py)
 		{
 			direction_state = eDirectionState::LEFT;
+			velocity.x = -SetVelocity();
+			velocity.y = 0.0f;
 		}
 		break;
 	default:
-		break;
-	}
-
-	// 進行方向の移動量を追加
-	switch (direction_state)
-	{
-	case eDirectionState::UP:
-		velocity.x = 0.0f;
-		velocity.y = -SetVelocity();
-		break;
-	case eDirectionState::DOWN:
-		velocity.x = 0.0f;
-		velocity.y = SetVelocity();
-		break;
-	case eDirectionState::LEFT:
-		velocity.x = -SetVelocity();
-		velocity.y = 0.0f;
-		break;
-	case eDirectionState::RIGHT:
-		velocity.x = SetVelocity();
-		velocity.y = 0.0f;
 		break;
 	}
 }
@@ -477,7 +469,7 @@ void EnemyBase::Movement(float delta_second)
 		}
 	}
 	// 移動量 * 速さ * 時間 で移動先を決定する
-	location += velocity * 50.0f * delta_second;
+	location += velocity * 100.0f * delta_second;
 
 	// 画面外に行ったら、反対側にワープさせる
 	if (location.x < 0.0f)
@@ -498,12 +490,21 @@ void EnemyBase::Movement(float delta_second)
 void EnemyBase::WaitMovement()
 {
 	//目的地が決まっていないとき
-	if (go_x == 0 && go_y == 0)
+	if (go_x == -1 && go_y == -1)
 	{
+		adjacent_panel = StageData::GetAdjacentPanelData(location);
+
 		//待機処理
-		
+		if (adjacent_panel[eAdjacentDirection::UP] == ePanelID::WALL)
+		{
+			SetDirection(eDirectionState::DOWN);
+		}
+		else if (adjacent_panel[eAdjacentDirection::DOWN] == ePanelID::WALL)
+		{
+			SetDirection(eDirectionState::UP);
+		}
 	}
-	//出口に向かうとき
+	//出口に向かう
 	else
 	{
 		//横方向処理
@@ -527,7 +528,11 @@ void EnemyBase::WaitMovement()
 			else
 			{
 				is_speed_down = false;
-				enemy_state = eEnemyState::SCATTER;
+				SetDirection(eDirectionState::LEFT);
+				if (direction_state == eDirectionState::LEFT)
+				{
+					enemy_state = eEnemyState::SCATTER;
+				}
 			}
 		}
 	}
@@ -538,7 +543,115 @@ void EnemyBase::WaitMovement()
 /// </summary>
 void EnemyBase::ScatterMovement()
 {
-	//direction_state = eDirectionState::LEFT;
+	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
+	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
+	int x[4], y[4];					//隣接するパネルの添え字保存用変数
+	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
+	eDirectionState next_direction;	//次に進む方向
+
+	//後ろの方向を設定
+	switch (direction_state)
+	{
+	case EnemyBase::UP:
+		back = eAdjacentDirection::DOWN;
+		break;
+	case EnemyBase::RIGHT:
+		back = eAdjacentDirection::LEFT;
+		break;
+	case EnemyBase::DOWN:
+		back = eAdjacentDirection::UP;
+		break;
+	case EnemyBase::LEFT:
+		back = eAdjacentDirection::RIGHT;
+		break;
+	default:
+		break;
+	}
+
+	//方向を配列に変換 & 隣接するパネルの位置を保存
+	for (int i = 0; i < 4; i++)
+	{
+		switch (i)
+		{
+		case 0:
+			direction[i] = eAdjacentDirection::RIGHT;
+			x[i] = this->x + 1;
+			y[i] = this->y;
+			break;
+		case 1:
+			direction[i] = eAdjacentDirection::DOWN;
+			x[i] = this->x;
+			y[i] = this->y + 1;
+			break;
+		case 2:
+			direction[i] = eAdjacentDirection::LEFT;
+			x[i] = this->x - 1;
+			y[i] = this->y;
+			break;
+		case 3:
+			direction[i] = eAdjacentDirection::UP;
+			x[i] = this->x;
+			y[i] = this->y - 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	//縄張りを設定
+	SetDestination();
+
+	//隣接するパネル情報を取得
+	adjacent_panel = StageData::GetAdjacentPanelData(location);
+
+	now_panel = StageData::GetPanelData(location);
+
+	if (now_panel == ePanelID::BRANCH)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			//後ろに行けないようにする
+			if (direction[i] == back)
+			{
+				continue;
+			}
+			else
+			{
+				//隣接するパネルが壁でないなら
+				if (adjacent_panel[direction[i]] != ePanelID::WALL)
+				{
+					//目標パネルまでの距離が１番短い方向を保存する
+					if (l >= (((go_x - x[i]) * (go_x - x[i])) + ((go_y - y[i]) * (go_y - y[i]))))
+					{
+						//距離を更新
+						l = (((go_x - x[i]) * (go_x - x[i])) + ((go_y - y[i]) * (go_y - y[i])));
+
+						//方向を更新
+						switch (i)
+						{
+						case 0:
+							next_direction = eDirectionState::RIGHT;
+							break;
+						case 1:
+							next_direction = eDirectionState::DOWN;
+							break;
+						case 2:
+							next_direction = eDirectionState::LEFT;
+							break;
+						case 3:
+							next_direction = eDirectionState::UP;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		SetDirection(next_direction);
+	}
+
 }
 
 /// <summary>
@@ -577,10 +690,27 @@ void EnemyBase::SetDestination()
 		go_y = 11;
 		break;
 	case SCATTER:
+		switch (enemy_type)
+		{
+		case EnemyBase::blinky:
+			go_x = 26;
+			go_y = 0;
+			break;
+		case EnemyBase::pinky:
+			go_x = 1;
+			go_y = 0;
+			break;
+		case EnemyBase::inky:
+			go_x = 26;
+			go_y = 30;
+			break;
+		case EnemyBase::clyde:
+			go_x = 1;
+			go_y = 30;
+			break;
+		}
 		break;
 	case CHASE:
-		break;
-	case FRIGHTENED:
 		break;
 	case ESCAPE:
 		break;
@@ -605,7 +735,7 @@ void EnemyBase::AnimationControl(float delta_second)
 {
 	// 移動中のアニメーション
 	animation_time += delta_second;
-	if (animation_time >= (0.4f))
+	if (animation_time >= (0.1f))
 	{
 		animation_time = 0.0f;
 		animation_count++;
@@ -644,9 +774,9 @@ void EnemyBase::AnimationControl(float delta_second)
 						image = move_animation[17];
 					}
 				}
-				//いじけアニメーション
 				else
 				{
+					//いじけアニメーション
 					image = move_animation[16 + animation_count];
 				}
 			}
