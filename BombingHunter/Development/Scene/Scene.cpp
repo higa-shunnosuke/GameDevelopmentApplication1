@@ -582,6 +582,11 @@ void Scene::UIDraw() const
 		//ãˆêŒ…‚Ì”
 		num = s3 / (int)pow(10, digit);
 
+		if (time == 0)
+		{
+			num = 0;
+		}
+
 		//ãˆêŒ…‚Ì”‚ğ•`‰æ
 		DrawRotaGraphF(45.0f + (i * 16.0f), 465.0f, 0.1, 0, number[num], TRUE, 0);
 
