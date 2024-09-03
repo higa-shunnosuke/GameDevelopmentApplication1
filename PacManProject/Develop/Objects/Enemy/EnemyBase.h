@@ -52,10 +52,13 @@ private:
 	int					dot_counter;		//ドットカウンター
 	int					dot_limit;			//ドット制限
 	bool				is_speed_down;		//減速フラグ
+	bool				is_speed_up;		//加速フラグ
+	bool				is_turn;			//ターンフラグ
+	float				speed;				//移動量
 	
 
 protected:
-	Vector2D			velocity;			//移動量
+	Vector2D			velocity;			//移動方向
 	eEnemyState			enemy_state;		//エネミー状態
 	eDirectionState		direction_state;	//進行方向状態
 	Player*				player;				//プレイヤー情報
@@ -119,7 +122,7 @@ private:
 	/// <summary>
 	/// 移動量設定処理
 	/// </summary>
-	float SetVelocity();
+	void SetVelocity();
 
 	/// <summary>
 	/// 方向設定処理
