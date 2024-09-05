@@ -16,6 +16,7 @@ Player::Player() :
 	now_direction_state(eDirectionState::LEFT),
 	next_direction_state(eDirectionState::LEFT),
 	food_count(0),
+	power_food_count(0),
 	animation_time(0.0f),
 	animation_count(0),
 	old_panel(ePanelID::NONE),
@@ -150,6 +151,7 @@ void Player::OnHitCollision(GameObjectBase* hit_object)
 	if(hit_object->GetCollision().object_type == eObjectType::power_food)
 	{
 		food_count++;
+		power_food_count++;
 		is_power_up = true;
 	}
 
@@ -170,6 +172,15 @@ void Player::OnHitCollision(GameObjectBase* hit_object)
 int Player::GetFoodCount() const
 {
 	return food_count;
+}
+
+/// <summary>
+/// パワー餌を食べた数取得
+/// </summary>
+/// <returns>パワー餌を食べた数</returns>
+int Player::GetPowerFoodCount() const
+{
+	return power_food_count;
 }
 
 /// <summary>
@@ -196,6 +207,14 @@ bool Player::GetPowerUp() const
 void Player::SetPowerDown()
 {
 	is_power_up = false;
+}
+
+/// <summary>
+/// 死亡させる
+/// </summary>
+void Player::SetDeath()
+{
+	player_state = ePlayerState::DIE;
 }
 
 bool Player::GetDestroy() const
