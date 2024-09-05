@@ -14,23 +14,27 @@ EnemyBase::EnemyBase():
 	eyes_animation(),
 	animation_time(0.0f),
 	animation_count(1),
-	time(0.0f),
+	is_start(false),
+	time(0.0f), 
+	time_count(0),
 	flash_count(0),is_flash(false),
 	enemy_type(eEnemyType::blinky),
 	velocity(0.0f),
-	enemy_state(eEnemyState::WAIT),
+	old_state(eEnemyState::WAIT),
+	now_state(eEnemyState::WAIT),
 	direction_state(eDirectionState::DOWN),
 	player(nullptr),
-	i(0),
 	enemy(nullptr),
 	x(0),y(0),
-	go_x(-1),go_y(-1),
+	go_x(13),go_y(13),
 	dot_counter(0),
 	dot_limit(0),
+	power_counter(0),
 	is_speed_down(false),
 	is_speed_up(false),
 	is_turn(false),
-	speed(0)
+	speed(0),
+	is_death(false)
 {
 
 }
@@ -77,6 +81,9 @@ void EnemyBase::Update(float delta_second)
 	//移動処理
 	Movement(delta_second);
 
+	//持ち時間制御
+	TimeControl(delta_second);
+
 	//アニメーション制御
 	AnimationControl(delta_second);
 }
@@ -84,20 +91,22 @@ void EnemyBase::Update(float delta_second)
 //更新処理
 void EnemyBase::Draw(const Vector2D& screen_offset) const
 {
+	Vector2D graph_location = this->location + screen_offset;
+
 	//ぼでーの描画
-	if (enemy_state != eEnemyState::ESCAPE)
+	if (now_state != eEnemyState::ESCAPE)
 	{
 		// 親クラスの描画処理を呼び出す
 		__super::Draw(screen_offset);
 	}
 
 	//目の描画
-	if (enemy_state != eEnemyState::FRIGHTENED)
+	if (is_start != true || now_state == eEnemyState::ESCAPE)
 	{
 		// オフセット値を基に画像の描画を行う
-		Vector2D graph_location = this->location + screen_offset;
 		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
 	}
+
 	
 #if _DEBUG
 
@@ -109,20 +118,24 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	switch (enemy_type)
 	{
 	case EnemyBase::blinky:
-		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y, enemy_state);
+		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y, now_state);
 		DrawBox(px-(D_OBJECT_SIZE / 2.0f), py-(D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xff0000, TRUE);
+		DrawLine(location.x, location.y + D_OBJECT_SIZE * 3.0f, px, py, 0xff0000, 5);
 		break;
 	case EnemyBase::pinky:
-		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, enemy_state);
+		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, now_state);
 		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xffa0ff, TRUE);
+		DrawLine(location.x, location.y + D_OBJECT_SIZE * 3.0f, px, py, 0xffa0ff, 5);
 		break;
 	case EnemyBase::inky:
-		DrawFormatString(390, 40, 0x00ffff, "%2d,%2d,%d", x,y, enemy_state);
+		DrawFormatString(390, 40, 0x00ffff, "%2d,%2d,%d", x,y, now_state);
 		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0x00ffff, TRUE);
+		DrawLine(location.x, location.y + D_OBJECT_SIZE * 3.0f, px, py, 0x00ffff, 5);
 		break;
 	case EnemyBase::clyde:
-		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, enemy_state);
+		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, now_state);
 		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xffa000, TRUE);
+		DrawLine(location.x, location.y + D_OBJECT_SIZE * 3.0f, px, py, 0xffa000, 5);
 		break;
 	}
 
@@ -135,15 +148,6 @@ void EnemyBase::Finalize()
 	// 動的配列の解放
 	move_animation.clear();
 	eyes_animation.clear();
-}
-
-/// <summary>
-/// エネミーの状態を取得する
-/// </summary>
-/// <returns>エネミーの状態</returns>
-eEnemyState EnemyBase::GetEnemyState() const
-{
-	return enemy_state;
 }
 
 /// <summary>
@@ -161,6 +165,7 @@ void EnemyBase::SetPlayer(Player* player)
 /// <param name="type">エネミーの種類</param>
 void EnemyBase::SetType()
 {
+	//現在座標の添え字を取得
 	StageData::ConvertToIndex(location, y, x);
 
 	switch (x)
@@ -169,7 +174,6 @@ void EnemyBase::SetType()
 		//アカベイ
 		enemy_type = eEnemyType::blinky;
 		enemy = dynamic_cast<EnemyBase*>(new Blinky());
-		enemy->Initialize();
 		// レイヤーの設定
 		z_layer = 6;
 		break;
@@ -177,26 +181,26 @@ void EnemyBase::SetType()
 		//ピンキー
 		enemy_type = eEnemyType::pinky;
 		enemy = dynamic_cast<EnemyBase*>(new Pinky());
-		enemy->Initialize();
 		z_layer = 7;
 		break;
 	case 12:
 		//アオスケ
 		enemy_type = eEnemyType::inky;
 		enemy = dynamic_cast<EnemyBase*>(new Inky());
-		enemy->Initialize();
 		z_layer = 8;
 		break;
 	case 16:
 		//グズタ
 		enemy_type = eEnemyType::clyde;
 		enemy = dynamic_cast<EnemyBase*>(new Clyde());
-		enemy->Initialize();
 		z_layer = 9;
 		break;
 	default:
 		break;
 	}
+
+	enemy->Initialize();
+	enemy->SetPlayer(player);
 
 	//初期画像設定
 	image = move_animation[enemy_type * 2];
@@ -207,8 +211,13 @@ void EnemyBase::SetType()
 /// </summary>
 void EnemyBase::ChangeState()
 {	
+	int old_power_count;	//パワー餌カウント用の変数
+
+	//状態の更新
+	old_state = now_state;
+
 	//待機状態を解除する
-	if (enemy_state == eEnemyState::WAIT)
+	if (now_state == eEnemyState::WAIT)
 	{
 		switch (enemy_type)
 		{
@@ -263,50 +272,70 @@ void EnemyBase::ChangeState()
 	}
 
 	//いじけ状態にする
-	if (player->GetPowerUp() == true && enemy_state != eEnemyState::ESCAPE && enemy_state != eEnemyState::WAIT)
+	if (player->GetPowerUp() == true && now_state != eEnemyState::ESCAPE && now_state != eEnemyState::WAIT)
 	{
-		if (enemy_state != eEnemyState::FRIGHTENED)
+		if (is_flash != true || GetDeathFlag() == true)
 		{
 			image = move_animation[16];
+			now_state = eEnemyState::FRIGHTENED;
 		}
-		enemy_state = eEnemyState::FRIGHTENED;
+	}
+	else if (player->GetPowerUp() != true)
+	{
+		is_start = false;
 	}
 
+	//パワー餌カウント更新
+	old_power_count = power_counter;
+	power_counter = player->GetPowerFoodCount();
+	//パワー餌を新しくだべたら死亡フラグを、falseにする
+	if (old_power_count != power_counter)
+	{
+		SetDeathFlag(false);
+		is_flash = false;
+		time_count = 0;
+
+		//イジケタイムのカウントを開始
+		is_start = true;
+	}
+	
 	// 入力状態の取得
 	InputManager* input = InputManager::GetInstance();
 
-	//点滅フラグ処理
+	//縄張りモードと追跡モードとを切り替える
 	if (input->GetKeyDown(KEY_INPUT_SPACE))
 	{
-		if (enemy_state == eEnemyState::FRIGHTENED)
+		if (now_state == eEnemyState::FRIGHTENED)
+		{
+			now_state = eEnemyState::CHASE;
+		}
+		else
+		{
+			now_state = eEnemyState::SCATTER;
+		}
+	}
+
+	//点滅フラグ処理
+	if (now_state == eEnemyState::FRIGHTENED)
+	{
+		if (time_count >= 6)
 		{
 			if (is_flash == false)
 			{
 				is_flash = true;
 			}
-			else
-			{
-				is_flash = false;
-			}
-		}
-		else if(enemy_state == eEnemyState::SCATTER)
-		{
-			enemy_state = eEnemyState::CHASE;
-		}
-		else if (enemy_state == eEnemyState::CHASE)
-		{
-			enemy_state = eEnemyState::SCATTER;
 		}
 	}
 
-	//いじけ状態から回復する
+	//いじけ状態からもとの状態に回復する
 	if (flash_count > 7)
 	{
 		image = move_animation[enemy_type * 2];
-		enemy_state = eEnemyState::SCATTER;
 		player->SetPowerDown();
+		is_start = false;
 		is_flash = false;
 		flash_count = 0;
+		now_state = eEnemyState::SCATTER;
 	}
 }
 
@@ -316,18 +345,36 @@ void EnemyBase::ChangeState()
 /// <param name="hit_object">当たったゲームオブジェクトのポインタ</param>
 void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 {
-	//いじけ状態のとき
-	if (enemy_state == eEnemyState::FRIGHTENED)
+	// 当たったオブジェクトがプレイヤーだったら
+	if (hit_object->GetCollision().object_type == eObjectType::player)
 	{
-		// 当たったオブジェクトがプレイヤーだったら
-		if (hit_object->GetCollision().object_type == eObjectType::player)
+		//いじけ状態のとき
+		if (now_state == eEnemyState::FRIGHTENED || now_state == eEnemyState::ESCAPE)
 		{
+			//逃げ状態にする
 			is_speed_up = true;
-			enemy_state = eEnemyState::ESCAPE;
+			now_state = eEnemyState::ESCAPE;
 			SetDestination();
+			SetDeathFlag(true);
+		}
+		else
+		{
+			//プレイヤーを死亡判定にする
+			player->SetDeath();
 		}
 	}
+}
 
+//死亡フラグ設定処理
+void EnemyBase::SetDeathFlag(bool is_death)
+{
+	this->is_death = is_death;
+}
+
+//死亡フラグ取得処理
+bool EnemyBase::GetDeathFlag()
+{
+	return is_death;
 }
 
 /// <summary>
@@ -409,7 +456,7 @@ void EnemyBase::Movement(float delta_second)
 	unsigned char old_panel;		//前フレームのパネル
 
 	// エネミー状態によって、動作を変える
-	switch (enemy_state)
+	switch (now_state)
 	{
 	case WAIT:
 		WaitMovement();
@@ -421,7 +468,7 @@ void EnemyBase::Movement(float delta_second)
 		TrackingMovement();
 		break;
 	case FRIGHTENED:
-		ScaredMovement();
+		FrightenedMovement();
 		break;
 	case ESCAPE:
 		EscapeMovement();
@@ -592,7 +639,7 @@ void EnemyBase::Movement(float delta_second)
 void EnemyBase::WaitMovement()
 {
 	//目的地が決まっていないとき
-	if (go_x == -1 && go_y == -1)
+	if (go_x == 13 && go_y == 13)
 	{
 		adjacent_panel = StageData::GetAdjacentPanelData(location);
 
@@ -633,7 +680,7 @@ void EnemyBase::WaitMovement()
 				SetDirection(eDirectionState::LEFT);
 				if (direction_state == eDirectionState::LEFT)
 				{
-					enemy_state = eEnemyState::SCATTER;
+					now_state = eEnemyState::SCATTER;
 				}
 			}
 		}
@@ -661,9 +708,9 @@ void EnemyBase::TrackingMovement()
 /// <summary>
 /// 移動処理
 /// </summary>
-void EnemyBase::ScaredMovement()
+void EnemyBase::FrightenedMovement()
 {
-
+	
 }
 
 /// <summary>
@@ -694,7 +741,7 @@ void EnemyBase::EscapeMovement()
 	if (y == 15 && x == 13)
 	{
 		is_speed_up = false;
-		enemy_state = eEnemyState::WAIT;
+		now_state = eEnemyState::WAIT;
 	}
 }
 
@@ -703,7 +750,7 @@ void EnemyBase::EscapeMovement()
 /// </summary>
 void EnemyBase::SetDestination()
 {
-	switch (enemy_state)
+	switch (now_state)
 	{
 	case WAIT:
 		go_x = 13;
@@ -742,9 +789,23 @@ void EnemyBase::SetDestination()
 /// <summary>
 /// 持ち時間制御
 /// </summary>
-void EnemyBase::TimeControl()
+void EnemyBase::TimeControl(float delta_second)
 {
+	if (is_start == true)
+	{
+		time += delta_second;
 
+		if (time >= 1.0f)
+		{
+			time = 0.0f;
+			time_count++;
+		}
+	}
+	else
+	{
+		time = 0.0f;
+		time_count = 0;
+	}
 }
 
 /// <summary>
@@ -755,7 +816,7 @@ void EnemyBase::AnimationControl(float delta_second)
 {
 	// 移動中のアニメーション
 	animation_time += delta_second;
-	if (animation_time >= (0.1f))
+	if (animation_time >= 0.2f)
 	{
 		animation_time = 0.0f;
 		animation_count++;
@@ -767,14 +828,17 @@ void EnemyBase::AnimationControl(float delta_second)
 
 		//画像の設定
 		//死んだときはアニメーションしない
-		if (enemy_state != eEnemyState::ESCAPE)
+		if (now_state != eEnemyState::ESCAPE)
 		{
 			//いじけ状態のとき
-			if (enemy_state == eEnemyState::FRIGHTENED)
+			if (now_state == eEnemyState::FRIGHTENED)
 			{
 				//点滅アニメーション
 				if (is_flash == true)
 				{
+					//イジケタイムのカウントを終了
+					is_start = true;
+
 					if (image == move_animation[16])
 					{
 						image = move_animation[19];

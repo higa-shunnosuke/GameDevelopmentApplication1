@@ -41,28 +41,31 @@ private:
 	std::vector<int>	eyes_animation;						//目のアニメーション画像
 	float				animation_time;		//アニメーション時間
 	int					animation_count;	//アニメーション添え字
-	float				time;				//各状態の持ち時間
+	bool				is_start;			//状態維持時間のカウント開始フラグ
+	float				time;				//状態維持時間
+	int					time_count;			//状態維持添え字
 	int					flash_count;		//点滅カウント用の変数
 	bool				is_flash;			//点滅フラグ
-	eEnemyType			enemy_type;			//エネミーの種類
-	int					i;					//操作キャラ変更用変数
 	EnemyBase*			enemy;				//エネミー情報
 	int					x, y;				//パネル保存用の変数
 	int					go_x,go_y;			//目的地のパネル保存用変数
 	int					dot_counter;		//ドットカウンター
 	int					dot_limit;			//ドット制限
+	int					power_counter;		//パワー餌カウンター
 	bool				is_speed_down;		//減速フラグ
 	bool				is_speed_up;		//加速フラグ
 	bool				is_turn;			//ターンフラグ
 	float				speed;				//移動量
 	
-
 protected:
 	Vector2D			velocity;			//移動方向
-	eEnemyState			enemy_state;		//エネミー状態
+	eEnemyType			enemy_type;			//エネミーの種類
+	eEnemyState			old_state;			//エネミー状態
+	eEnemyState			now_state;			//エネミー状態
 	eDirectionState		direction_state;	//進行方向状態
 	Player*				player;				//プレイヤー情報
-	
+	bool				is_death;			//死亡フラグ
+
 public:
 	EnemyBase();
 	virtual ~EnemyBase();
@@ -84,12 +87,6 @@ public:
 	virtual void OnHitCollision(GameObjectBase* hit_object) override;
 
 	/// <summary>
-	/// エネミーの状態を取得する
-	/// </summary>
-	/// <returns>エネミーの状態</returns>
-	eEnemyState GetEnemyState() const;
-
-	/// <summary>
 	/// プレイヤーのポインタ受け取り処理
 	/// </summary>
 	/// <param name="player">プレイヤーのポインタ</param>
@@ -101,17 +98,21 @@ public:
 	/// <param name="type">エネミーの種類</param>
 	void SetType();
 
-private:
 	/// <summary>
 	/// エネミー状態変更処理
 	/// </summary>
 	void ChangeState();
 
-	
+	//死亡フラグ設定処理
+	void SetDeathFlag(bool is_death);
+	//死亡フラグ取得処理
+	bool GetDeathFlag();
+
+private:
 	/// <summary>
 	/// 持ち時間制御
 	/// </summary>
-	void TimeControl();
+	void TimeControl(float delta_second);
 
 	/// <summary>
 	/// アニメーション制御
@@ -149,7 +150,7 @@ private:
 	/// <summary>
 	/// 移動処理
 	/// </summary>
-	void ScaredMovement();
+	void FrightenedMovement();
 
 	/// <summary>
 	/// 移動処理
