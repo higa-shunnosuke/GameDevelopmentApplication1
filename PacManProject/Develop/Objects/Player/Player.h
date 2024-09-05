@@ -36,6 +36,7 @@ private:
 	eDirectionState now_direction_state;	// 現在進行方向状態
 	eDirectionState next_direction_state;	// 次回進行方向状態
 	int food_count;							// 餌を食べた数
+	int power_food_count;					//パワー餌を食べた数
 	float animation_time;					// アニメーション時間
 	int animation_count;					// アニメーション添字
 	ePanelID old_panel;						// 前回パネル情報
@@ -68,6 +69,12 @@ public:
 	int GetFoodCount() const;
 
 	/// <summary>
+	/// パワー餌を食べた数取得
+	/// </summary>
+	/// <returns>パワー餌を食べた数</returns>
+	int GetPowerFoodCount() const;
+
+	/// <summary>
 	/// プレイヤーの状態を取得する
 	/// </summary>
 	/// <returns>プレイヤーの状態</returns>
@@ -83,6 +90,11 @@ public:
 	/// パワーダウンさせる
 	/// </summary>
 	void SetPowerDown();
+
+	/// <summary>
+	/// 死亡させる
+	/// </summary>
+	void SetDeath();
 
 	/// <summary>
 	/// プレイヤーがパワーアップしてるか確認する
