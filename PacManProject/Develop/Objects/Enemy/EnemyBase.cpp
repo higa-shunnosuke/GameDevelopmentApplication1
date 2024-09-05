@@ -43,8 +43,6 @@ EnemyBase::~EnemyBase()
 //初期化処理
 void EnemyBase::Initialize()
 {
-	//ステージデータの読み込み
-
 	// アニメーション画像の読み込み
 	ResourceManager* rm = ResourceManager::GetInstance();
 	move_animation = rm->GetImages("Resource/Images/monster.png", 20, 20, 1, 32, 32);
@@ -98,7 +96,7 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	{
 		// オフセット値を基に画像の描画を行う
 		Vector2D graph_location = this->location + screen_offset;
-		DrawRotaGraphF(graph_location.x, graph_location.y, 1.1, 0.0, eyes_animation[direction_state], TRUE);
+		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
 	}
 	
 #if _DEBUG
@@ -112,19 +110,19 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	{
 	case EnemyBase::blinky:
 		DrawFormatString(100, 40, 0xff0000, "%2d,%2d,%d", x,y, enemy_state);
-		DrawCircle(px, py, 10, 0xff0000, TRUE);
+		DrawBox(px-(D_OBJECT_SIZE / 2.0f), py-(D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xff0000, TRUE);
 		break;
 	case EnemyBase::pinky:
 		DrawFormatString(245, 40, 0xffa0ff, "%2d,%2d,%d", x,y, enemy_state);
-		DrawCircle(px, py, 10, 0xffa0ff, TRUE);
+		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xffa0ff, TRUE);
 		break;
 	case EnemyBase::inky:
 		DrawFormatString(390, 40, 0x00ffff, "%2d,%2d,%d", x,y, enemy_state);
-		DrawCircle(px, py, 10, 0x00ffff, TRUE);
+		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0x00ffff, TRUE);
 		break;
 	case EnemyBase::clyde:
 		DrawFormatString(535, 40, 0xffa000, "%2d,%2d,%d", x,y, enemy_state);
-		DrawCircle(px, py, 10, 0xffa000, TRUE);
+		DrawBox(px - (D_OBJECT_SIZE / 2.0f), py - (D_OBJECT_SIZE / 2.0f), px + (D_OBJECT_SIZE / 2.0f), py + (D_OBJECT_SIZE / 2.0f), 0xffa000, TRUE);
 		break;
 	}
 
@@ -136,6 +134,7 @@ void EnemyBase::Finalize()
 {
 	// 動的配列の解放
 	move_animation.clear();
+	eyes_animation.clear();
 }
 
 /// <summary>
