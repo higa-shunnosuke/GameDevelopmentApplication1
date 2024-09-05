@@ -103,11 +103,6 @@ public:
 	/// </summary>
 	void ChangeState();
 
-	//死亡フラグ設定処理
-	void SetDeathFlag(bool is_death);
-	//死亡フラグ取得処理
-	bool GetDeathFlag();
-
 private:
 	/// <summary>
 	/// 持ち時間制御

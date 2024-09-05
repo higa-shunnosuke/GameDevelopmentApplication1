@@ -101,7 +101,7 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 	}
 
 	//目の描画
-	if (is_start != true || now_state == eEnemyState::ESCAPE)
+	if (now_state != eEnemyState::FRIGHTENED)
 	{
 		// オフセット値を基に画像の描画を行う
 		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
@@ -274,15 +274,15 @@ void EnemyBase::ChangeState()
 	//いじけ状態にする
 	if (player->GetPowerUp() == true && now_state != eEnemyState::ESCAPE && now_state != eEnemyState::WAIT)
 	{
-		if (is_flash != true || GetDeathFlag() == true)
+		if (is_death == true)
+		{
+
+		}
+		else if (is_flash != true)
 		{
 			image = move_animation[16];
 			now_state = eEnemyState::FRIGHTENED;
 		}
-	}
-	else if (player->GetPowerUp() != true)
-	{
-		is_start = false;
 	}
 
 	//パワー餌カウント更新
@@ -291,7 +291,7 @@ void EnemyBase::ChangeState()
 	//パワー餌を新しくだべたら死亡フラグを、falseにする
 	if (old_power_count != power_counter)
 	{
-		SetDeathFlag(false);
+		is_death = false;
 		is_flash = false;
 		time_count = 0;
 
@@ -305,11 +305,11 @@ void EnemyBase::ChangeState()
 	//縄張りモードと追跡モードとを切り替える
 	if (input->GetKeyDown(KEY_INPUT_SPACE))
 	{
-		if (now_state == eEnemyState::FRIGHTENED)
+		if (now_state == eEnemyState::SCATTER)
 		{
 			now_state = eEnemyState::CHASE;
 		}
-		else
+		else if (now_state == eEnemyState::CHASE)
 		{
 			now_state = eEnemyState::SCATTER;
 		}
@@ -355,7 +355,7 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 			is_speed_up = true;
 			now_state = eEnemyState::ESCAPE;
 			SetDestination();
-			SetDeathFlag(true);
+			is_death = true;
 		}
 		else
 		{
@@ -363,18 +363,6 @@ void EnemyBase::OnHitCollision(GameObjectBase* hit_object)
 			player->SetDeath();
 		}
 	}
-}
-
-//死亡フラグ設定処理
-void EnemyBase::SetDeathFlag(bool is_death)
-{
-	this->is_death = is_death;
-}
-
-//死亡フラグ取得処理
-bool EnemyBase::GetDeathFlag()
-{
-	return is_death;
 }
 
 /// <summary>
@@ -742,6 +730,7 @@ void EnemyBase::EscapeMovement()
 	{
 		is_speed_up = false;
 		now_state = eEnemyState::WAIT;
+		image = move_animation[enemy_type * 2];
 	}
 }
 
@@ -837,7 +826,7 @@ void EnemyBase::AnimationControl(float delta_second)
 				if (is_flash == true)
 				{
 					//イジケタイムのカウントを終了
-					is_start = true;
+					is_start = false;
 
 					if (image == move_animation[16])
 					{
