@@ -223,10 +223,6 @@ void EnemyBase::ChangeState()
 		{
 		case EnemyBase::blinky:
 			SetDestination();
-			if (x == 13 && y == 11)
-			{
-				SetDirection(eDirectionState::LEFT);
-			}
 			break;
 		case EnemyBase::pinky:
 			if (dot_limit >= 0)
@@ -438,6 +434,7 @@ void EnemyBase::Movement(float delta_second)
 {
 	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
 	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
+	eDirectionState reverse = eDirectionState::DOWN;		//後ろの方向を保存する用の変数
 	int x[4], y[4];					//隣接するパネルの添え字保存用変数
 	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
 	eDirectionState next_direction;	//次に進む方向
@@ -470,15 +467,19 @@ void EnemyBase::Movement(float delta_second)
 	{
 	case EnemyBase::UP:
 		back = eAdjacentDirection::DOWN;
+		reverse = eDirectionState::DOWN;
 		break;
 	case EnemyBase::RIGHT:
 		back = eAdjacentDirection::LEFT;
+		reverse = eDirectionState::LEFT;
 		break;
 	case EnemyBase::DOWN:
 		back = eAdjacentDirection::UP;
+		reverse = eDirectionState::UP;
 		break;
 	case EnemyBase::LEFT:
 		back = eAdjacentDirection::RIGHT;
+		reverse = eDirectionState::RIGHT;
 		break;
 	default:
 		break;
@@ -531,6 +532,22 @@ void EnemyBase::Movement(float delta_second)
 	{
 		for (int i = 0; i < 4; i++)
 		{
+			////特定の範囲では上に曲がれないようにする
+			//if (i == 3)
+			//{
+			//	if (this->x >= 11 && this->x <= 16)
+			//	{
+			//		if (this->y == 11)
+			//		{
+			//			continue;
+			//		}
+			//		else if (this->y == 23)
+			//		{
+			//			continue;
+			//		}
+			//	}
+			//}
+
 			//後ろに行けないようにする
 			if (direction[i] == back)
 			{
@@ -580,6 +597,15 @@ void EnemyBase::Movement(float delta_second)
 		if (next_direction == direction_state)
 		{
 			is_turn = true;
+		}
+	}
+
+	//状態が変わると進行方向を反対にする
+	if (old_state != eEnemyState::WAIT)
+	{
+		if (old_state != now_state)
+		{
+			direction_state = reverse;
 		}
 	}
 
