@@ -103,8 +103,8 @@ void EnemyBase::Draw(const Vector2D& screen_offset) const
 		// オフセット値を基に画像の描画を行う
 		DrawRotaGraphF(graph_location.x, graph_location.y, 1.0, 0.0, eyes_animation[direction_state], TRUE);
 	}
-
 	
+
 #if _DEBUG
 
 	//目標パネルの座標
@@ -519,10 +519,6 @@ void EnemyBase::Movement(float delta_second)
 	//隣接するパネル情報を取得
 	adjacent_panel = StageData::GetAdjacentPanelData(location);
 
-	//現在パネルの更新
-	old_panel = now_panel;
-	now_panel = StageData::GetPanelData(location);
-
 	//状態が変わると進行方向を反対にする
 	if (old_state != eEnemyState::WAIT)
 	{
@@ -534,6 +530,10 @@ void EnemyBase::Movement(float delta_second)
 			}
 		}
 	}
+
+	//現在パネルの更新
+	old_panel = now_panel;
+	now_panel = StageData::GetPanelData(location);
 
 	//パネルを移動したらターンフラグを初期化する
 	if (old_panel != now_panel)
@@ -719,8 +719,14 @@ void EnemyBase::ScatterMovement()
 /// </summary>
 void EnemyBase::TrackingMovement()
 {
+	int x, y;
+
+	//プレイヤーの座標の添え字を取得
+	StageData::ConvertToIndex(player->GetLocation(), y, x);
+
 	//各エネミーの追跡処理
-	enemy->TrackingMovement();
+	go_x = x;
+	go_y = y;
 }
 
 /// <summary>
