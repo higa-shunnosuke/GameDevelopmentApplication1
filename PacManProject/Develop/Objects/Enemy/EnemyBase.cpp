@@ -61,9 +61,6 @@ void EnemyBase::Initialize()
 
 	// 可動性の設定
 	mobility = eMobilityType::Movable;
-
-	//初期進行方向の設定
-	SetDirection(eDirectionState::UP);
 }
 
 //更新処理
@@ -270,11 +267,7 @@ void EnemyBase::ChangeState()
 	//いじけ状態にする
 	if (player->GetPowerUp() == true && now_state != eEnemyState::ESCAPE && now_state != eEnemyState::WAIT)
 	{
-		if (is_death == true)
-		{
-
-		}
-		else if (is_flash != true)
+		if (is_flash != true && is_death != true)
 		{
 			image = move_animation[16];
 			now_state = eEnemyState::FRIGHTENED;
@@ -295,19 +288,27 @@ void EnemyBase::ChangeState()
 		is_start = true;
 	}
 	
-	// 入力状態の取得
-	InputManager* input = InputManager::GetInstance();
-
-	//縄張りモードと追跡モードとを切り替える
-	if (input->GetKeyDown(KEY_INPUT_SPACE))
+	//縄張りモードと追跡モードを切り替える
+	if (now_state == eEnemyState::SCATTER)
 	{
-		if (now_state == eEnemyState::SCATTER)
+		//縄張りモードのカウントを開始
+		is_start = true;
+
+		if (time_count >= 7)
 		{
 			now_state = eEnemyState::CHASE;
+			is_start = false;
 		}
-		else if (now_state == eEnemyState::CHASE)
+	}
+	else if (now_state == eEnemyState::CHASE)
+	{
+		//追跡モードのカウントを開始
+		is_start = true;
+
+		if (time_count >= 20)
 		{
 			now_state = eEnemyState::SCATTER;
+			is_start = false;
 		}
 	}
 
@@ -435,9 +436,9 @@ void EnemyBase::Movement(float delta_second)
 	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
 	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
 	eDirectionState reverse = eDirectionState::DOWN;		//後ろの方向を保存する用の変数
+	eDirectionState next_direction = eDirectionState::DOWN;	//次に進む方向を保存する用の変数
 	int x[4], y[4];					//隣接するパネルの添え字保存用変数
 	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
-	eDirectionState next_direction;	//次に進む方向
 	unsigned char old_panel;		//前フレームのパネル
 
 	// エネミー状態によって、動作を変える
@@ -522,13 +523,25 @@ void EnemyBase::Movement(float delta_second)
 	old_panel = now_panel;
 	now_panel = StageData::GetPanelData(location);
 
+	//状態が変わると進行方向を反対にする
+	if (old_state != eEnemyState::WAIT)
+	{
+		if (old_state != now_state)
+		{
+			if (adjacent_panel[direction[back]] != ePanelID::WALL)
+			{
+				direction_state = reverse;
+			}
+		}
+	}
+
 	//パネルを移動したらターンフラグを初期化する
 	if (old_panel != now_panel)
 	{
 		is_turn = false;
 	}
 
-	if (now_panel == ePanelID::BRANCH)
+	if (now_panel == ePanelID::BRANCH && now_state != eEnemyState::FRIGHTENED)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -597,15 +610,6 @@ void EnemyBase::Movement(float delta_second)
 		if (next_direction == direction_state)
 		{
 			is_turn = true;
-		}
-	}
-
-	//状態が変わると進行方向を反対にする
-	if (old_state != eEnemyState::WAIT)
-	{
-		if (old_state != now_state)
-		{
-			direction_state = reverse;
 		}
 	}
 
@@ -724,7 +728,162 @@ void EnemyBase::TrackingMovement()
 /// </summary>
 void EnemyBase::FrightenedMovement()
 {
-	
+	SetDestination();
+
+	eAdjacentDirection direction[4];//隣接するパネル情報を確認する用の変数
+	eAdjacentDirection back = eAdjacentDirection::DOWN;		//後ろの方向を保存する用の変数
+	eDirectionState next_direction = eDirectionState::DOWN;	//次に進む方向を保存する用の変数
+	int x[4], y[4];					//隣接するパネルの添え字保存用変数
+	int l = 999;					//参照するパネルから目標パネルまでの２点間の距離
+	unsigned char old_panel;		//前フレームのパネル
+	int i = 0;						//カウント用変数
+	bool is_break = false;			//ループ終了フラグ
+
+	//後ろの方向を設定
+	switch (direction_state)
+	{
+	case EnemyBase::UP:
+		back = eAdjacentDirection::DOWN;
+		break;
+	case EnemyBase::RIGHT:
+		back = eAdjacentDirection::LEFT;
+		break;
+	case EnemyBase::DOWN:
+		back = eAdjacentDirection::UP;
+		break;
+	case EnemyBase::LEFT:
+		back = eAdjacentDirection::RIGHT;
+		break;
+	default:
+		break;
+	}
+
+	//方向を配列に変換 & 隣接するパネルの位置を保存
+	for (int i = 0; i < 4; i++)
+	{
+		switch (i)
+		{
+		case 0:
+			direction[i] = eAdjacentDirection::RIGHT;
+			x[i] = this->x + 1;
+			y[i] = this->y;
+			break;
+		case 1:
+			direction[i] = eAdjacentDirection::DOWN;
+			x[i] = this->x;
+			y[i] = this->y + 1;
+			break;
+		case 2:
+			direction[i] = eAdjacentDirection::LEFT;
+			x[i] = this->x - 1;
+			y[i] = this->y;
+			break;
+		case 3:
+			direction[i] = eAdjacentDirection::UP;
+			x[i] = this->x;
+			y[i] = this->y - 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	//隣接するパネル情報を取得
+	adjacent_panel = StageData::GetAdjacentPanelData(location);
+
+	//現在パネルの更新
+	old_panel = now_panel;
+	now_panel = StageData::GetPanelData(location);
+
+	//パネルを移動したらターンフラグを初期化する
+	if (old_panel != now_panel)
+	{
+		is_turn = false;
+	}
+
+	if (now_panel == ePanelID::BRANCH)
+	{
+		while (is_break != true)
+		{
+			i = GetRand(3);
+			is_break = true;
+
+			////特定の範囲では上に曲がれないようにする
+			//if (i == 3)
+			//{
+			//	if (this->x >= 11 && this->x <= 16)
+			//	{
+			//		if (this->y == 11)
+			//		{
+			//			continue;
+			//		}
+			//		else if (this->y == 23)
+			//		{
+			//			continue;
+			//		}
+			//	}
+			//}
+
+			//後ろに行けないようにする
+			if (direction[i] == back)
+			{
+				is_break = false;
+				continue;
+			}
+			else
+			{
+				//隣接するパネルが壁でないなら
+				if (adjacent_panel[direction[i]] != ePanelID::WALL)
+				{
+					//目標パネルまでの距離が１番短い方向を保存する
+					if (l >= (((go_x - x[i]) * (go_x - x[i])) + ((go_y - y[i]) * (go_y - y[i]))))
+					{
+						//距離を更新
+						l = (((go_x - x[i]) * (go_x - x[i])) + ((go_y - y[i]) * (go_y - y[i])));
+
+						//方向を更新
+						switch (i)
+						{
+						case 0:
+							next_direction = eDirectionState::RIGHT;
+							break;
+						case 1:
+							next_direction = eDirectionState::DOWN;
+							break;
+						case 2:
+							next_direction = eDirectionState::LEFT;
+							break;
+						case 3:
+							next_direction = eDirectionState::UP;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+				else
+				{
+					if (now_state == eEnemyState::FRIGHTENED)
+					{
+						is_break = false;
+						continue;
+					}
+				}
+			}
+		}
+
+		//移動方向を変更する
+		if (is_turn == false)
+		{
+			SetDirection(next_direction);
+		}
+
+		//BRANCHの中では１回まで曲がれるようにする
+		if (next_direction == direction_state)
+		{
+			is_turn = true;
+		}
+	}
 }
 
 /// <summary>
@@ -791,6 +950,10 @@ void EnemyBase::SetDestination()
 			go_y = 30;
 			break;
 		}
+		break;
+	case FRIGHTENED:
+		go_x = 13;
+		go_y = 13;
 		break;
 	case ESCAPE:
 		go_x = 13;
